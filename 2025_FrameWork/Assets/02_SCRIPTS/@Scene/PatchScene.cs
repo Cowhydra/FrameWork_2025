@@ -45,6 +45,7 @@ public class PatchScene : UIScene
 
         // 애셋 번들 로딩
         AssetBundleLoader.Initalize(OnBundlerEnterError, OnBundleSizeAction, OnBundleDownLoadAction, OnLoadMemoryAction,OnLoadToMemoryComplete);
+
     }
 
 

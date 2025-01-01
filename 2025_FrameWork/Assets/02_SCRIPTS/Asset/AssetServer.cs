@@ -1,33 +1,35 @@
 
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
-public static class AssetServer 
+public static partial class AssetServer 
 {
     // 실제 로드된 리소스 
     // 하나의 Dictionary 으로 관리중이지만 나눌 필요는 있음
-    public static Dictionary<string, UnityEngine.Object> _resources { get; private set; } = new Dictionary<string, Object>();
+    public static Dictionary<string, UnityEngine.Object> TotalResourceDict { get; private set; } = new Dictionary<string, UnityEngine.Object>();
 
 
     public static bool AddResource(string key, UnityEngine.Object obj)
     {
-        if (_resources.ContainsKey(key) == true)
+        if (TotalResourceDict.ContainsKey(key) == true)
         {
             return false;
         }
         else
         {
-            _resources.Add(key, obj);
+            TotalResourceDict.Add(key, obj);
             return true;
         }
     }
 
 
     #region 리소스 로드
-    public static T Load<T>(string key) where T : Object
+    public static T Load<T>(string key) where T : UnityEngine.Object
     {
-        if (_resources.TryGetValue(key, out Object resource))
+        if (TotalResourceDict.TryGetValue(key, out UnityEngine.Object resource))
         {
             return resource as T;
         }
@@ -50,7 +52,7 @@ public static class AssetServer
            return ObjectPool.Instance.Pop(prefab);
         }
 
-        GameObject go = Object.Instantiate(prefab, parent);
+        GameObject go = UnityEngine.Object.Instantiate(prefab, parent);
 
         go.name = prefab.name;
         return go;
@@ -70,7 +72,7 @@ public static class AssetServer
             return ObjectPool.Instance.Pop(resource);
         }
 
-        GameObject go = Object.Instantiate(resource, parent);
+        GameObject go = UnityEngine.Object.Instantiate(resource, parent);
 
         go.name = resource.name;
 
@@ -115,7 +117,7 @@ public static class AssetServer
             return component;
         }
 
-        GameObject go = Object.Instantiate(prefab, parent);
+        GameObject go = UnityEngine.Object.Instantiate(prefab, parent);
         go.name = prefab.name;
         return component;
     }

@@ -11,6 +11,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/01_SCENE/02_Patch.unity
     guid: 3e823ee2d403ec141ab6777a713a1e86
+  - enabled: 1
+    path: Assets/01_SCENE/03_Looby.unity
+    guid: 3affc68b6fcdbfb48af4051ea697e28a
+  - enabled: 1
+    path: Assets/01_SCENE/04_Game.unity
+    guid: 10aa4d5874e32a64b8c221f1b918e76c
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 900a1c4b09d48764ab52e4c9d27e9dee, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: f1bc2d61315a018489015775bc9a40f5, type: 2}

@@ -53,5 +53,29 @@ public static class SceneLoader
     {
         return SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName(sceneName));
     }
+
+
+    public static AsyncOperation LoadZoneSceneAsync(string sceneName, LoadSceneMode loadSceneMode)
+    {
+        try
+        {
+            if (AppDef.ASSET_BUNDLE_MODE)
+            {
+                return SceneManager.LoadSceneAsync(sceneName, loadSceneMode);
+            }
+#if UNITY_EDITOR
+            else
+            {
+                return UnityEditor.SceneManagement.EditorSceneManager.LoadSceneAsyncInPlayMode("Assets/03_ASSET_BUNDLE/zone/" + sceneName + "/" + sceneName + ".unity", new LoadSceneParameters(loadSceneMode));
+            }
+#endif
+        }
+        catch (Exception e)
+        {
+            Debug.LogException(e);
+        }
+
+        return null;
+    }
 }
 

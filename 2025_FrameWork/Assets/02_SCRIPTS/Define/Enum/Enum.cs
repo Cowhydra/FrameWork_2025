@@ -35,6 +35,6 @@ namespace D_F_Enum
         public static string Start = "01_Start";
         public static string Patch = "02_Patch";
         public static string Game = "04_Game";
-        public static string Lobby = "03_Lobby";
+        public static string Lobby = "03_Looby";
     }
 }

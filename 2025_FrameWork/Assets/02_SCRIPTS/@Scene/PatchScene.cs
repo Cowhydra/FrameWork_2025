@@ -157,5 +157,6 @@ public class PatchScene : UIScene
     private void OnLoadToMemoryComplete()
     {
         Debug.Log("로드 완료 !");
+        SceneLoader.LoadScene(D_F_Enum.SCENE_NAME.Lobby);
     }
 }

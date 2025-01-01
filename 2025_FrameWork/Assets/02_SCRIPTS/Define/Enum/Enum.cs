@@ -37,4 +37,10 @@ namespace D_F_Enum
         public static string Game = "04_Game";
         public static string Lobby = "03_Looby";
     }
+
+
+    public static class TAG
+        {
+        public static string MyPlayer = "MyPlayer";
+        }
 }

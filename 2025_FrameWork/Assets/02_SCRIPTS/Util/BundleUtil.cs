@@ -43,4 +43,11 @@ public static class BundleUtil
         return $"{ConvertByteByUnit(byteSize, unit).ToString("0.00")}{unitStr}";
     }
 
+
+
+    //데이터 관리
+    public static string GetMonsterAssetLabel(int modelNumber)
+    {
+        return $"model/monster/Enemy_{modelNumber:D3}";
+    }
 }

@@ -10,6 +10,9 @@ public abstract class BaseActor : MonoBehaviour
     public int[] Mana = new int[2];
 
     public Vector3 GetCord => gameObject.transform.position;
+    public int ClientIndex { get; protected set; } = -1;
+    public int UniqueIndex { get; protected set; }
+
 
 
     public virtual void OnDamaged(int damage)
@@ -40,9 +43,9 @@ public static class ActorActionID
     public static string IDLE = "idle";
     public static string RUN = "run";
     public static string DIE = "die";
-
-
-    public static int ATTACK = 100;
+    public static string DETECT = "detect";//¼øÂû
+    public static string Chase = "Chase";//Ãß°Ý
+    public static string ATTACK = "attack";
     public static int BEATEN = 101;
 
 

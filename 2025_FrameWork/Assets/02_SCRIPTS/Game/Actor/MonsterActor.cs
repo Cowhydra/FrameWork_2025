@@ -5,7 +5,7 @@ public partial class MonsterActor : BaseActor
 {
     MonsterData _MonsterData;
 
-    public override E_OBJECT_TYPE ObjectType => E_OBJECT_TYPE.MONSTER;
+    protected override E_OBJECT_TYPE ObjectType => E_OBJECT_TYPE.MONSTER;
 
     public bool IsDead => Health[0] > 0;
 

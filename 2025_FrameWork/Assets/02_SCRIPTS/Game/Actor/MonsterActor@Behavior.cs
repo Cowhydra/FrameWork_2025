@@ -1,5 +1,4 @@
 using UnityEngine;
-using static UnityEngine.UI.GridLayoutGroup;
 
 public partial class MonsterActor : BaseActor
 {
@@ -14,7 +13,6 @@ public partial class MonsterActor : BaseActor
     public float detectRange => _MonsterData.DetectionRange;
 
     public D_F_Enum.E_ATTACK_TYPE attackType => _MonsterData.AttackType;
-
 
 
     private void Awake()
@@ -130,15 +128,6 @@ public partial class MonsterActor : BaseActor
     {
         TargetActor.OnDamaged((int)attackpower);
     }
-
-
-    public void PlayAnimator(string anim)
-    {
-        if (anim != null)
-        {
-            _animator.Play(anim);
-        }
-    }
 }
 
 
@@ -157,7 +146,7 @@ public class MonsterStateNode_Idle : StateNode
 
         if (_Owner != null)
         {
-            _Owner.PlayAnimator(ActorActionID.IDLE);
+            _Owner.PlayAnimator(ActorActionID.Idle);
         }
     }
 }
@@ -230,7 +219,7 @@ public class MonsterStateNode_Attack : StateNode
 
         if (_Owner != null)
         {
-            _Owner.PlayAnimator(ActorActionID.ATTACK);
+            _Owner.PlayAnimator(ActorActionID.Attack);
         }
     }
 }

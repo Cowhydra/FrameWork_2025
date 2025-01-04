@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PatchScene : UIScene
+public class PatchScene : UIScene, IBundleLoaderOwner
 {
     public GameObject MessageObj;       // 진행 메시지 객체
     public TextMeshProUGUI MessageLbl;  // 진행 메시지 라벨
@@ -15,6 +17,8 @@ public class PatchScene : UIScene
 
     [SerializeField] private  AssetBundleLoader AssetBundleLoader;
     private long _TotalBundleDownloadSize = 0;
+
+    public List<string> BundleLabels { get => new List<string>() { "ui", "model", "data", "animation" }; }
 
     protected override void Awake()
     {
@@ -44,7 +48,7 @@ public class PatchScene : UIScene
         yield return null;
 
         // 애셋 번들 로딩
-        AssetBundleLoader.Initalize(OnBundlerEnterError, OnBundleSizeAction, OnBundleDownLoadAction, OnLoadMemoryAction,OnLoadToMemoryComplete);
+        AssetBundleLoader.Initalize(this);
 
     }
 
@@ -85,7 +89,7 @@ public class PatchScene : UIScene
     }
 
 
-    private void OnBundleSizeAction(long size)
+    void IBundleLoaderOwner.OnBundleSizeAction(long size)
     {
         _TotalBundleDownloadSize = size;
 
@@ -116,9 +120,9 @@ public class PatchScene : UIScene
             );
     }
 
+   
 
-
-    private void OnBundleDownLoadAction(long size)
+    void IBundleLoaderOwner.OnBundleDownLoadAction(long size)
     {
         //여기서는 그냥 몇초뒤에 다음 씬으로 넘기면 될듯 
         SetMessage(string.Format("번들 다운로드중.. :{0}/{1}", size.ToString(), _TotalBundleDownloadSize.ToString()));
@@ -134,7 +138,7 @@ public class PatchScene : UIScene
 
 
 
-    private void OnLoadMemoryAction(string label, int loadCount, int totalCount)
+     void IBundleLoaderOwner.OnLoadMemoryAction(string label, int loadCount, int totalCount)
     {
         ShowProgressBar(true);
         UpdateProgress((float)loadCount / totalCount);
@@ -143,7 +147,7 @@ public class PatchScene : UIScene
 
 
 
-    private void OnBundlerEnterError(int errocde)
+     void OnBundlerEnterError(int errocde)
     {
         //시작씬으로 보내야함  메세지 출력 후 
         Current.OpenOKMsgBox($" 번들 다운로드 Error : {errocde}", null, 0,
@@ -154,9 +158,14 @@ public class PatchScene : UIScene
     }
 
 
-    private void OnLoadToMemoryComplete()
+     void IBundleLoaderOwner.OnLoadToMemoryComplete()
     {
         Debug.Log("로드 완료 !");
         SceneLoader.LoadScene(D_F_Enum.SCENE_NAME.Lobby);
+    }
+
+    void IBundleLoaderOwner.OnBundlerEnterError(int errocde)
+    {
+        OnBundlerEnterError(errocde);
     }
 }

@@ -15,12 +15,13 @@ public class AssetBundleLoader : MonoBehaviour
     private System.DateTime _EnterTime;
     AssetBundleLoader_Error _BundleError;// 에러상태는 외부에서도 호출 가능하도록
     AssetBundleLoader_DownloadSize _DownloadSize;
-    public List<string> DownLoadLabels = new List<string>() { "ui", "model" };
+    public List<string> DownLoadLabels;
 
     //여기에 콜백 함수를 넣어줘야할 수 있음 그래야 외부에서 가능
-    public void Initalize(Action<int> OnBundlerEnterError, Action<long> OnBundleSizeAction, Action<long> OnBundleDownLoadAction, Action<string,int,int> OnLoadMemoryAction,Action OnLoadToMemoryComplete)
+    public void Initalize(IBundleLoaderOwner owner ) 
     {
         _EnterTime = System.DateTime.Now;
+        DownLoadLabels = owner.BundleLabels;
 
         if (_BundleState == null)
         {
@@ -29,7 +30,7 @@ public class AssetBundleLoader : MonoBehaviour
 
         if (_BundleError == null)
         {
-            _BundleError = new AssetBundleLoader_Error("BundleError", OnBundlerEnterError);
+            _BundleError = new AssetBundleLoader_Error("BundleError", owner.OnBundlerEnterError);
         }
 
         AssetBundleLoader_Init _BundleInit = new AssetBundleLoader_Init("BundleInit");
@@ -38,12 +39,12 @@ public class AssetBundleLoader : MonoBehaviour
 
         if (_DownloadSize == null)
         {
-            _DownloadSize = new AssetBundleLoader_DownloadSize("DownloadSize", DownLoadLabels, OnBundleSizeAction);
+            _DownloadSize = new AssetBundleLoader_DownloadSize("DownloadSize", DownLoadLabels, owner.OnBundleSizeAction);
         }
 
-        AssetBundleLoader_DownloadBundles _DownloadBundles = new AssetBundleLoader_DownloadBundles("DownloadBundles", DownLoadLabels, OnBundleDownLoadAction);
-        AssetBundleLoader_LoadToMemory _LoadToMemory = new AssetBundleLoader_LoadToMemory("LoadToMemory", DownLoadLabels, OnLoadMemoryAction);
-        AssetBundleLoader_LoadToMemory_Complete _LoadToMemory_Complete = new AssetBundleLoader_LoadToMemory_Complete("LoadToMemory_Complete", OnLoadToMemoryComplete);
+        AssetBundleLoader_DownloadBundles _DownloadBundles = new AssetBundleLoader_DownloadBundles("DownloadBundles", DownLoadLabels, owner.OnBundleDownLoadAction);
+        AssetBundleLoader_LoadToMemory _LoadToMemory = new AssetBundleLoader_LoadToMemory("LoadToMemory", DownLoadLabels, owner.OnLoadMemoryAction);
+        AssetBundleLoader_LoadToMemory_Complete _LoadToMemory_Complete = new AssetBundleLoader_LoadToMemory_Complete("LoadToMemory_Complete", owner.OnLoadToMemoryComplete);
 
         //초기화
         _BundleInit.Transitions.Add(new StateTransition(_BundleCheckValid, () => _BundleInit.StateID == E_STATE_ID.ERROR));

@@ -13,6 +13,13 @@ public partial class GameLogic : SingletonObj<GameLogic>
 
 
 
+    //TODO; 임시
+    private void Awake()
+    {
+        Initialzied();
+    }
+
+
     //몬스터들 스폰로직
     private int _MonsterCount;
     public int MonsterCount { get
@@ -22,7 +29,7 @@ public partial class GameLogic : SingletonObj<GameLogic>
         set
         {
             _MonsterCount = value;
-            if (_MonsterCount > _maxSpawnCount)
+            if (_MonsterCount > StageMaxMonster)
             {
                 Debug.Log("게임 패배");
             }

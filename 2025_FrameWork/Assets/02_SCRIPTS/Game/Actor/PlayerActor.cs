@@ -3,9 +3,26 @@ using UnityEngine;
 
 public class PlayerActor : BaseActor
 {
-    public override E_OBJECT_TYPE ObjectType => E_OBJECT_TYPE.PLAYER;
+    [SerializeField] private float _moveSpeed=10f;
+    protected override  E_OBJECT_TYPE ObjectType => E_OBJECT_TYPE.PLAYER;
 
     public bool IsMyPlayer => true;
+
+    private void OnEnable()
+    {
+        RegisterListers(MsnLRT.ADD_LISTENER);
+    }
+
+    private void OnDisable()
+    {
+        RegisterListers(MsnLRT.REMOVE_LISTENER);
+    }
+
+
+    private void RegisterListers(MsnLRT val)
+    {
+        Messenger<Vector2>.RegisterListener(val, MsgID.CHAR_MOVING_DIRECTION, Moving);
+    }
 
 
     private int _exp;
@@ -21,4 +38,25 @@ public class PlayerActor : BaseActor
         }
     }
 
+
+    public void Moving(Vector2 movePos)
+    {
+        Vector3 movement = new Vector3(movePos.x,0,movePos.y) * _moveSpeed * Time.deltaTime;
+        transform.Translate(movement, Space.World);
+
+        // 캐릭터가 바라보는 방향 설정 
+        //transform.forward = new Vector3(movePos.x, movePos.y, 0);
+
+        Debug.Log($"move pos x:{movePos.x} , y: {movePos.y}");
+        Debug.Log($"forward : {transform.forward}");
+
+
+        // 이동 방향에 따라 모델이 바라보는 방향 설정
+        if (movePos != Vector2.zero)
+        {
+            Vector3 forwardDirection = new Vector3(movePos.x, 0, movePos.y);
+            Quaternion targetRotation = Quaternion.LookRotation(forwardDirection); // 이동 방향으로의 회전 계산
+            transform.rotation = targetRotation * Quaternion.Euler(-90, 0, 0); // X축 -90도 보정 추가
+        }
+    }
 }

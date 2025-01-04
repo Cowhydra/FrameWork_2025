@@ -29,9 +29,10 @@ public class UIJoyStick : MonoBehaviour
     private void OnEnable()
     {
         _InputActions.UI.Enable();
-        
+
         //UI용도 Navigate를 사용하는 방법도 공부해볼 것
         _InputActions.UI.Point.performed += OnPointerPointPerformed;
+
 
         _InputActions.UI.Press.performed += OnPointerClick;
         _InputActions.UI.Press.started += OnPointerClick;
@@ -45,13 +46,17 @@ public class UIJoyStick : MonoBehaviour
     private void OnDisable()
     {
         // Disable Input Actions
-        _InputActions.UI.Point.performed -= OnPointerPointPerformed;
 
-        _InputActions.UI.Press.performed-= OnPointerClick;
-        _InputActions.UI.Press.started -= OnPointerClick;
-        _InputActions.UI.Press.canceled -= OnPointerClick;
+        if (_InputActions != null)
+        {
+            _InputActions.UI.Point.performed -= OnPointerPointPerformed;
 
-        _InputActions.UI.Disable();
+            _InputActions.UI.Press.performed -= OnPointerClick;
+            _InputActions.UI.Press.started -= OnPointerClick;
+            _InputActions.UI.Press.canceled -= OnPointerClick;
+
+            _InputActions.UI.Disable();
+        }
     }
 
     private void OnPointerClick(InputAction.CallbackContext context)
@@ -111,6 +116,8 @@ public class UIJoyStick : MonoBehaviour
                 {
                     _JoyStickHandle.anchoredPosition = Vector2.ClampMagnitude(direction, _JoyStickRange);
                 }
+
+                Messenger<Vector2>.Broadcast(MsgID.CHAR_MOVING_DIRECTION, _JoyStickHandle.anchoredPosition);
             }
             else
             {

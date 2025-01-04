@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Animaition
+  m_EditorClassIdentifier: 
+  m_GroupName: Animaition
+  m_GUID: 6e1afa31efcba4e4498d3cba373d0cb7
+  m_SerializeEntries:
+  - m_GUID: f5cd5f733ecf8194ba2669210ceac11f
+    m_Address: animatonclip
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - animation
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 474ac506d02b8db4ea065c5a2e0cef4d, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: e8a5b91d169f35e459fd823452548cd4, type: 2}
+    - {fileID: 11400000, guid: 8c612e893ea1e3040990f0513bfda9ee, type: 2}

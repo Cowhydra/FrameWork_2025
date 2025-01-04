@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 617ca45f1fcefa04cbc327b88094ff97
   m_currentHash:
     serializedVersion: 2
-    Hash: 00000000000000000000000000000000
+    Hash: 629cc13d1512bc23d8697cf60c1d1dea
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 1
   m_CatalogRequestsTimeout: 0
@@ -62,6 +62,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d37a28415be889746bcd2bf106749ac1, type: 2}
   - {fileID: 11400000, guid: 3ef497dcff58abc43bb5fe2313c7ff2c, type: 2}
   - {fileID: 11400000, guid: 6e2908b1d4086374e823a5867e6d8678, type: 2}
+  - {fileID: 11400000, guid: b93cc6b083371d14c8ad4c476b1f6c23, type: 2}
   - {fileID: 11400000, guid: 6a2dfd48f06a72a49a292e91e6f7c817, type: 2}
   - {fileID: 11400000, guid: 38d8445724a1c9645b7c804adda53fbe, type: 2}
   m_BuildSettings:
@@ -120,6 +121,7 @@ MonoBehaviour:
     - model
     - ui
     - data
+    - animation
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 11fbba9354d83e54588285bc488a8254, type: 2}

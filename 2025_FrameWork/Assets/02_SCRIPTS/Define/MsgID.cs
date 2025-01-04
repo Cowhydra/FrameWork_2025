@@ -5,4 +5,5 @@ public enum MsgID : int
     DLG_BOX_ENABLED,
     CUR_DLG_BOX_CHANGED,
 
+    CHAR_MOVING_DIRECTION
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public partial class MonsterActor : BaseActor
 {
-    public PlayerActor TargetActor => GameLogic.Instance.MyPlayer;
+    public PlayerActor TargetActor => GameLogic.MyPlayer;
     private StateMachine _MonsterAI;
     public bool IsMoving = false;
 
@@ -126,7 +126,14 @@ public partial class MonsterActor : BaseActor
     //타겟 받을 필요는 있음
     public void Attack()
     {
-        TargetActor.OnDamaged((int)attackpower);
+        if (BattleUtil.GetSuccessFor_ONE_M(500) == true)
+        {
+            TargetActor.ON_HIT_INFO(D_F_Enum.E_HIT_SORT.CRITICAL,(int)attackpower);
+        }
+        else
+        {
+            TargetActor.ON_HIT_INFO(D_F_Enum.E_HIT_SORT.NORMAL, (int)attackpower);
+        }
     }
 }
 

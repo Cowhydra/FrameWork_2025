@@ -14,13 +14,14 @@ public class MonsterSpawner :MonoBehaviour
 
     private void OnDestroy()
     {
-        this.SafeStopCoroutine(ref _SpawnCo);
+        SpawnStop();
     }
+
 
     public void Initialize(GameLogic logic)
     {
         _Logic = logic;
-        _MyPlayer = _Logic.MyPlayer;
+        _MyPlayer = GameLogic.MyPlayer;
         _MyPlayerPos = _Logic.MyPlayerPos;
     }
 
@@ -34,12 +35,18 @@ public class MonsterSpawner :MonoBehaviour
     }
 
 
+    public void SpawnStop()
+    {
+        this.SafeStopCoroutine(ref _SpawnCo);
+    }
+
+
     //5초에 한번씩 실행
     private IEnumerator SpawnMonsters()
     {
         while (true)
         {
-            int curMonster =GameLogic.Instance.MonsterCount;
+            int curMonster = _Logic.MonsterCount;
 
             int spawnTarget = 20;
 
@@ -60,7 +67,7 @@ public class MonsterSpawner :MonoBehaviour
                 if (_Logic.FindEmptyMonster(monsterIndex, out int slotIndex) == true)
                 {
                     AssetServer.Instantiate(BundleUtil.GetMonsterAssetLabel(AssetServer.MonsterDataDict.Value[monsterIndex].ModelNumber), null, true);
-                    _Logic.Monsters[slotIndex].Set(monsterIndex, slotIndex);
+                    _Logic.Monsters[slotIndex].Set(monsterIndex, slotIndex, _Logic.CurStage);
                 }
 
                 yield return null;

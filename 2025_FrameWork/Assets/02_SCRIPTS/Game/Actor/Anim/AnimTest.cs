@@ -20,11 +20,11 @@ public class AnimTest : MonoBehaviour
     {
         if (Input.GetKeyUp(KeyCode.W))
         {
-            GameLogic.Instance.MyPlayer.PlayAnimator(ActorActionID.Walk);
+            //GameLogic.Instance.MyPlayer.PlayAnimator(ActorActionID.Walk);
         }
         else if (Input.GetKeyUp(KeyCode.S))
         {
-            GameLogic.Instance.MyPlayer.PlayAnimator("Jump");
+           // GameLogic.Instance.MyPlayer.PlayAnimator("Jump");
         }
 
     }

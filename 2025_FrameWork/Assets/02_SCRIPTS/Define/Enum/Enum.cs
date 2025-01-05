@@ -30,6 +30,14 @@ namespace D_F_Enum
     }
 
 
+    public enum E_HIT_SORT : byte
+    {
+        NORMAL=0,
+        CRITICAL=1,
+
+    }
+
+
     public static class SCENE_NAME
     {
         public static string Start = "01_Start";

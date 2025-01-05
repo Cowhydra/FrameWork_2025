@@ -1,5 +1,6 @@
 using D_F_Enum;
 
+[System.Serializable]
 public class MonsterData 
 {
     public readonly int UniqueKey;

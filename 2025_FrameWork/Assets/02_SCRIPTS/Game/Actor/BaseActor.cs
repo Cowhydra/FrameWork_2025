@@ -1,3 +1,4 @@
+using D_F_Enum;
 using UnityEngine;
 
 public partial class BaseActor : MonoBehaviour
@@ -19,7 +20,7 @@ public partial class BaseActor : MonoBehaviour
 
 
 
-    public virtual void OnDamaged(int damage)
+    public virtual void ON_HIT_INFO(E_HIT_SORT hitSort, int damage)
     {
         Health[0] -= damage;
 
@@ -34,12 +35,7 @@ public partial class BaseActor : MonoBehaviour
     }
 
 
-    public virtual void Die()
-    {
-        AssetServer.Destroy(gameObject);
-
-        PlayAnimator(ActorActionID.Die);
-    }
+    public virtual void Die() { }
 
 
 }

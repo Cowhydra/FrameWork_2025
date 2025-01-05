@@ -1,16 +1,17 @@
-using System.Collections;
 using D_F_Enum;
-using UnityEditor.PackageManager;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using System.Collections;
 
-public partial class GameLogic : SingletonObj<GameLogic>
+public partial class GameLogic : MonoBehaviour
 {
     //씬의 이름으로 부터 생성해야할 몬스터들을 가져와야 합니다.
-    public PlayerActor MyPlayer;
+    public static PlayerActor MyPlayer;
+
+    public static StageData StageData;
+
+    public MonsterSpawner _Spawner;
 
     public Vector3 MyPlayerPos => MyPlayer != null ? MyPlayer.GetCord : Vector3.zero;
-
 
 
     //TODO; 임시
@@ -18,23 +19,6 @@ public partial class GameLogic : SingletonObj<GameLogic>
     {
         Initialzied();
     }
-
-
-    //몬스터들 스폰로직
-    private int _MonsterCount;
-    public int MonsterCount { get
-        {
-            return _MonsterCount;
-        }
-        set
-        {
-            _MonsterCount = value;
-            if (_MonsterCount > StageMaxMonster)
-            {
-                Debug.Log("게임 패배");
-            }
-        }
-       }
 
 
     public void Initialzied()
@@ -47,5 +31,16 @@ public partial class GameLogic : SingletonObj<GameLogic>
         }
     }
 
-  
+
+
+    public IEnumerator StageLoad()
+    {
+        _Spawner.SpawnStop();
+        yield return null;
+        ClearMonster();
+        yield return null;
+        SetUpNextStage();
+        yield return null;
+        _Spawner.SpawnStart();
+    }
 }

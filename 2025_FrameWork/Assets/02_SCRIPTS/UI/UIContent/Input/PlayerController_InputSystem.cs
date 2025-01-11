@@ -4,67 +4,36 @@ using UnityEngine.InputSystem;
 
 //=====================================//
 // Stated, Perforemd, Canceld 다 따로따로 이벤트 등록//
-public class UIJoyStick : MonoBehaviour
+public class PlayerController_InputSystem : MonoBehaviour
 {
     [SerializeField] private RectTransform _JoyStickHandle; // 조이스틱 핸들 UI
     [SerializeField] private RectTransform _JoyStickBG; // 조이스틱 배경 UI
     [SerializeField] private float _JoyStickRange = 50f; // 핸들이 움직일 수 있는 최대 거리
-
-    private InputSystem_Actions _InputActions; // 생성된 InputActions 클래스
-
     private bool IsValid => _JoyStickBG.gameObject.activeSelf;
     private RectTransform _MyRectTransform;
-
     private bool isDragging = false;
 
 
     private void Awake()
     {
-        _InputActions = new InputSystem_Actions();
         TryGetComponent(out _MyRectTransform);
-    }
-
-
-    //액션 활성
-    private void OnEnable()
-    {
-        _InputActions.UI.Enable();
-
-        //UI용도 Navigate를 사용하는 방법도 공부해볼 것
-        _InputActions.UI.Point.performed += OnPointerPointPerformed;
-
-
-        _InputActions.UI.Press.performed += OnPointerClick;
-        _InputActions.UI.Press.started += OnPointerClick;
-        _InputActions.UI.Press.canceled += OnPointerClick;
+        InputManager.Instance.OnUIPointInput(true,OnPointerPointPerformed);
+        InputManager.Instance.OnUIPressInput(true,OnPointerPress);
 
         _JoyStickBG.SetActiveEx(false);
     }
-
-
-    //액션 비활성
-    private void OnDisable()
+    private void OnDestroy()
     {
-        // Disable Input Actions
-
-        if (_InputActions != null)
-        {
-            _InputActions.UI.Point.performed -= OnPointerPointPerformed;
-
-            _InputActions.UI.Press.performed -= OnPointerClick;
-            _InputActions.UI.Press.started -= OnPointerClick;
-            _InputActions.UI.Press.canceled -= OnPointerClick;
-
-            _InputActions.UI.Disable();
-        }
+        InputManager.Instance.OnUIPointInput(false, OnPointerPointPerformed);
+        InputManager.Instance.OnUIPressInput(false, OnPointerPress);
     }
 
-    private void OnPointerClick(InputAction.CallbackContext context)
+    private void OnPointerPress(InputAction.CallbackContext context)
     {
         if (context.started)
         {
             _JoyStickBG.SetActiveEx(true);
-            Debug.Log($"OnPointerClick : started");
+            Debug.Log($"OnPointerPress : started");
         }
         else if (context.performed)
         {
@@ -78,14 +47,14 @@ public class UIJoyStick : MonoBehaviour
 
             isDragging = true;
 
-            Debug.Log($"OnPointerClick : performed");
+            Debug.Log($"OnPointerPress : performed");
         }
         else
         {
             _JoyStickBG.SetActiveEx(false);
             isDragging = false;
 
-            Debug.Log($"OnPointerClick : canceled");
+            Debug.Log($"OnPointerPress : canceled");
         }
 
     }

@@ -291,7 +291,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _JoyStickHandle: {fileID: 1099840206}
   _JoyStickBG: {fileID: 1491495867}
-  _JoyStickRange: 100
+  _JoyStickRange: 50
 --- !u!1 &553035937
 GameObject:
   m_ObjectHideFlags: 0
@@ -896,7 +896,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1491495867
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1276,8 +1276,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74a6837c30710cf46a3078c9cac8b455, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MyPlayer: {fileID: 0}
-  StageMaxMonster: 100
+  _Spawner: {fileID: 0}
 --- !u!1 &1742591477
 GameObject:
   m_ObjectHideFlags: 0

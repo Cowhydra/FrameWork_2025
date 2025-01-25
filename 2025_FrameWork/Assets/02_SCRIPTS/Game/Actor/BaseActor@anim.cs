@@ -46,11 +46,11 @@ public partial class BaseActor : MonoBehaviour
     {
         if (ObjectType == D_F_Enum.E_OBJECT_TYPE.MONSTER)
         {
-            return $"animatonclip/enemy/enemy_{UniqueIndex:D3}/{anim}.anim";
+            return $"animatonclip/enemy/enemy_{UniqueIndex:D3}/enemy_{UniqueIndex:D3}animcontroller.controller";
         }
         else if (ObjectType == D_F_Enum.E_OBJECT_TYPE.PLAYER)
         {
-            return $"animatonclip/player/{anim}.anim";
+            return $"animatonclip/player/playeranimcontroller.controller";
         }
 
         return string.Empty;

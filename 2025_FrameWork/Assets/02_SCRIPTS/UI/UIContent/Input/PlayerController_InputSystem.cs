@@ -33,8 +33,10 @@ public class PlayerController_InputSystem : MonoBehaviour
         if (context.started)
         {
             _JoyStickBG.SetActiveEx(true);
+#if ENABLE_INPUT_LOG
             Debug.Log($"OnPointerPress : started");
-        }
+#endif
+            }
         else if (context.performed)
         {
 
@@ -46,15 +48,17 @@ public class PlayerController_InputSystem : MonoBehaviour
             }
 
             isDragging = true;
-
+#if ENABLE_INPUT_LOG
             Debug.Log($"OnPointerPress : performed");
+#endif
         }
         else
         {
             _JoyStickBG.SetActiveEx(false);
             isDragging = false;
-
+#if ENABLE_INPUT_LOG
             Debug.Log($"OnPointerPress : canceled");
+#endif
         }
 
     }
@@ -90,7 +94,9 @@ public class PlayerController_InputSystem : MonoBehaviour
             }
             else
             {
+                #if ENABLE_INPUT_LOG
                 Debug.Log($"Dragging: perforemd");
+#endif
             }
         }
     }

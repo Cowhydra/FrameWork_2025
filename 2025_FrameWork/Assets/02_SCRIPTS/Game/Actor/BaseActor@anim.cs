@@ -1,58 +1,65 @@
+using System.Collections.Generic;
+using UnityEditor.Animations;
 using UnityEngine;
 
 public partial class BaseActor : MonoBehaviour
 {
     //모든 행동은 강제플레이가 아니면 아이돌로
-    Animation _animation;
+    private Animator _animator;
 
     public void PlayAnimator(string anim)
     {
-        if (_animation == null)
+        if (_animator == null)
         {
             return;
         }
-
-        if (ObjectType == D_F_Enum.E_OBJECT_TYPE.MONSTER)
+    
+        if (_animator.runtimeAnimatorController == null)
         {
-            _animation.clip = AssetServer.Load<AnimationClip>($"animatonclip/enemy/enemy_{UniqueIndex:D3}/{anim}.anim");
-        }
-        else if (ObjectType == D_F_Enum.E_OBJECT_TYPE.PLAYER)
-        {
-            _animation.clip = AssetServer.Load<AnimationClip>($"animatonclip/player/{anim}.anim");
+            string path = GetAnimationPath(anim);
+
+            if (AssetServer.GetAnimatorController(anim,out var controller) == false)
+            {
+                return;
+            }
+
+            _animator.runtimeAnimatorController= controller;
         }
 
-        _animation.Play();
+        _animator.Play(anim);
     }
 
 
     private void UpdateForceIdle()
     {
-        if (_animation == null)
+        if (_animator == null)
         {
             return;
         }
 
-        if (_animation.isPlaying == false)
-        {
-            if(ObjectType== D_F_Enum.E_OBJECT_TYPE.MONSTER)
-            {
-                _animation.clip = AssetServer.Load<AnimationClip>($"animatonclip/enemy/enemy_{UniqueIndex:D3}/{ActorActionID.Idle}.anim");
-            }
-            else if (ObjectType == D_F_Enum.E_OBJECT_TYPE.PLAYER)
-            {
-                _animation.clip = AssetServer.Load<AnimationClip>($"animatonclip/player/{ActorActionID.Idle}.anim");
-            }
-        }
-
-        if (_animation.clip != null)
-        {
-            _animation.Play();
-        }
+        // Idle 애니메이션이 필요하면 실행
+        PlayAnimator(ActorActionID.Idle);
     }
 
 
-    private void Update()
+    private string GetAnimationPath(string anim)
     {
+        if (ObjectType == D_F_Enum.E_OBJECT_TYPE.MONSTER)
+        {
+            return $"animatonclip/enemy/enemy_{UniqueIndex:D3}/{anim}.anim";
+        }
+        else if (ObjectType == D_F_Enum.E_OBJECT_TYPE.PLAYER)
+        {
+            return $"animatonclip/player/{anim}.anim";
+        }
+
+        return string.Empty;
+    }
+
+
+    private void UpdateAnimation()
+    {
+        //TEMP
         UpdateForceIdle();
     }
 }

@@ -13,11 +13,25 @@ public partial class BaseActor : MonoBehaviour
     public int ClientIndex { get; protected set; } = -1;
     public int UniqueIndex { get; protected set; }
 
+    public int ThisActionID { get; protected set; }
+
+
     private void Awake()
     {
-        TryGetComponent(out _animation);
+        TryGetComponent(out _animator);
     }
 
+
+    private void Update()
+    {
+        UpdateAnimation();
+    }
+
+
+    private void OnDestroy()
+    {
+
+    }
 
 
     public virtual void ON_HIT_INFO(E_HIT_SORT hitSort, int damage)

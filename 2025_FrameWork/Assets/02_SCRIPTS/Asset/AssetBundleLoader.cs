@@ -8,6 +8,7 @@ using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceLocations;
 
+
 public class AssetBundleLoader : MonoBehaviour
 {
     public static string InitDownloadURL;

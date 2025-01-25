@@ -29,9 +29,15 @@ public static partial class AssetServer
     #region 리소스 로드
     public static T Load<T>(string key) where T : UnityEngine.Object
     {
-        if (TotalResourceDict.TryGetValue(key, out UnityEngine.Object resource))
+        if (TotalResourceDict.TryGetValue(key, out UnityEngine.Object resource) == true) 
         {
             return resource as T;
+        }
+        else
+        {
+            //TODO:임시이며 따로 로딩 해야함.. 
+            AssetBundleLoader_LoadToMemory loader = new AssetBundleLoader_LoadToMemory(key, new List<string>() { key }, null);
+            loader.Enter();
         }
 
         return null;

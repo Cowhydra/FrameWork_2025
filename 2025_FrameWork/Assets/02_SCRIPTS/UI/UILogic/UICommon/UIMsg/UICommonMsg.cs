@@ -2,10 +2,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-//
-// 중앙하단에 나타나는 Msg
-// ex) 자동사냥중 장비 장착 불가능
-//
 public class UICommonMsg : MonoBehaviour
 {
     private enum EState

@@ -5,6 +5,7 @@ public partial class UIScene : MonoBehaviour
     private UICommonMsg _CommonMsg;
     private UINoticeMsg _NoticeMsg;
     private UISystemMsg _SystemMsg;
+    private UISliderMsg _SliderMsg;
 
 
     public void ShowCommonMsg(string msg)
@@ -57,8 +58,47 @@ public partial class UIScene : MonoBehaviour
     }
 
 
-    public void ShowBroadcastMsg(string[] args = null)
+    public void InitSliderMsg(string msg)
     {
-        
+        if (_SliderMsg == null)
+        {
+            return;
+        }
+
+        _SliderMsg.InitSliderMsg(msg);
+    }
+
+
+    public void ClearSliderMsg()
+    {
+        if (_SliderMsg == null)
+        {
+            return;
+        }
+
+        _SliderMsg.ClearSliderMsg();
+    }
+
+
+    public void ChangeSliderMsg(string msg)
+    {
+        if (_SliderMsg == null)
+        {
+            return;
+        }
+
+        _SliderMsg.ChangeSliderMsg(msg);
+    }
+
+
+    // 진행률 갱신
+    public void UpdateSliderProgress(float rate)
+    {
+        if (_SliderMsg == null)
+        {
+            return;
+        }
+
+        _SliderMsg.UpdateProgress(rate);
     }
 }

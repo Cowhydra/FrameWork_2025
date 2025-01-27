@@ -16,8 +16,8 @@ namespace D_F_Enum
         PLAYER=1,
         MONSTER=2,
         BOSS=4,
-        PROJECTTILE,
-        ITEM,
+        PROJECTTILE=5,
+        ITEM=6,
     }
 
 
@@ -33,9 +33,19 @@ namespace D_F_Enum
     public enum E_HIT_SORT : byte
     {
         NORMAL=0,
-        CRITICAL=1,
-
+        FAR=1,
+        MAGIC=2,
     }
+
+
+    public enum E_BEATEN_SORT : byte
+    {
+        NORMAL = 0,
+        CRITICAL = 1,
+        FAR = 2,
+        MAGIC = 3,
+    }
+
 
 
     public static class SCENE_NAME

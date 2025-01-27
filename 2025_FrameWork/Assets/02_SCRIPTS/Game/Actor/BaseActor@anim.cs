@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor.Animations;
 using UnityEngine;
 
 public partial class BaseActor : MonoBehaviour
@@ -18,12 +17,12 @@ public partial class BaseActor : MonoBehaviour
         {
             string path = GetAnimationPath(anim);
 
-            if (AssetServer.GetAnimatorController(anim,out var controller) == false)
-            {
-                return;
-            }
+            RuntimeAnimatorController rc = AssetServer.Load<RuntimeAnimatorController>(anim);
 
-            _animator.runtimeAnimatorController= controller;
+            if (rc != null)
+            {
+                _animator.runtimeAnimatorController = rc;
+            }
         }
 
         _animator.Play(anim);

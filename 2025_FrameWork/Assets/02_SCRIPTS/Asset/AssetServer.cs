@@ -1,8 +1,4 @@
-
-
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public static partial class AssetServer 
@@ -35,12 +31,27 @@ public static partial class AssetServer
         }
         else
         {
-            //TODO:임시이며 따로 로딩 해야함.. 
+            //TODO:임시이며 따로 로딩 해야함.. 라벨 단위로.,.
             AssetBundleLoader_LoadToMemory loader = new AssetBundleLoader_LoadToMemory(key, new List<string>() { key }, null);
             loader.Enter();
         }
 
         return null;
+    }
+
+
+
+    public static T LoadFromResources<T>(string key) where T : UnityEngine.Object
+    {
+        GameObject prefab = Resources.Load<GameObject>($"{key}");
+
+        if (prefab == null)
+        {
+            Debug.LogError($"Failed to load prefab : {key}");
+            return null;
+        }
+
+        return prefab as T;
     }
 
 
@@ -56,6 +67,29 @@ public static partial class AssetServer
         if (pooling)
         {
            return ObjectPool.Instance.Pop(prefab);
+        }
+
+        GameObject go = UnityEngine.Object.Instantiate(prefab, parent);
+
+        go.name = prefab.name;
+        return go;
+    }
+
+
+
+    public static GameObject InstantiateFromResource(string key, Transform parent = null, bool pooling = false)
+    {
+        GameObject prefab = LoadFromResources<GameObject>($"{key}");
+
+        if (prefab == null)
+        {
+            Debug.LogError($"Failed to load prefab : {key}");
+            return null;
+        }
+
+        if (pooling)
+        {
+            return ObjectPool.Instance.Pop(prefab);
         }
 
         GameObject go = UnityEngine.Object.Instantiate(prefab, parent);
@@ -104,7 +138,7 @@ public static partial class AssetServer
 
     public static T InstantiateFromResource<T>(string path, Transform parent = null, bool pooling = false)
     {
-        GameObject prefab = Resources.Load<GameObject>($"{path}");
+        GameObject prefab = LoadFromResources<GameObject>(path);
         if (prefab == null)
         {
             Debug.LogError($"Failed to load prefab : {path}");

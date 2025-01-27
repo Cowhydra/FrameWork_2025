@@ -121,25 +121,6 @@ public partial class MonsterActor : BaseActor
             IsMoving = true;
         }
     }
-
-
-    //타겟 받을 필요는 있음
-    public void Attack()
-    {
-        if (TargetActor == null)
-        {
-            return;
-        }
-
-        if (BattleUtil.GetSuccessFor_ONE_M(500) == true)
-        {
-            TargetActor.ON_HIT_INFO(D_F_Enum.E_HIT_SORT.CRITICAL,(int)attackpower);
-        }
-        else
-        {
-            TargetActor.ON_HIT_INFO(D_F_Enum.E_HIT_SORT.NORMAL, (int)attackpower);
-        }
-    }
 }
 
 

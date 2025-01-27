@@ -5,8 +5,9 @@ using UnityEngine.UI;
 using TMPro;
 
 //
-// 빨간색 중앙 상단 시스템 공지
+// 빨간색 중앙  시스템 공지
 //
+
 public class UISystemMsg : MonoBehaviour
 {
     public Image MsgBG;

@@ -24,7 +24,8 @@ public partial class UIScene : MonoBehaviour
 
     protected virtual void Awake()
     {
-        // [CANVAS RECT_TRANSFORM]
+        Current = this;
+
         Canvas canvas = GetComponent<Canvas>();
         Debug.Assert(canvas != null, "Canvas not found!!");
 
@@ -60,6 +61,9 @@ public partial class UIScene : MonoBehaviour
 
         _SystemMsg = NotiWndParent.Find("SystemMsg")?.GetComponent<UISystemMsg>();
         Debug.Assert(_SystemMsg != null, "SystemMsg not found!!");
+
+        _SliderMsg = NotiWndParent.Find("SliderMsg")?.GetComponent<UISliderMsg>();
+        Debug.Assert(_SystemMsg != null, "SliderMsg not found!!");
 
         // [TOUCH_BLOCK_OBJ]
         TouchBlockObj = SafeArea.Find("TouchBlock")?.gameObject;
@@ -98,5 +102,12 @@ public partial class UIScene : MonoBehaviour
         { 
             TouchBlockObj.SetActive(val);
         }
+    }
+
+
+    // 현재 SceneUI 설정
+    public static void SetCurSceneUI(UIScene sceneUI)
+    {
+        Current = sceneUI;
     }
 }

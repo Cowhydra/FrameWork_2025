@@ -67,7 +67,7 @@ public class MonsterSpawner :MonoBehaviour
                 if (_Logic.FindEmptyMonster(monsterIndex, out int slotIndex) == true)
                 {
                     AssetServer.Instantiate(BundleUtil.GetMonsterAssetLabel(AssetServer.MonsterDataDict.Value[monsterIndex].ModelNumber), null, true);
-                    _Logic.Monsters[slotIndex].Set(monsterIndex, slotIndex, _Logic.CurStage);
+                    _Logic.Monsters[slotIndex].Set(monsterIndex,slotIndex, slotIndex, _Logic.CurStage);
                 }
 
                 yield return null;

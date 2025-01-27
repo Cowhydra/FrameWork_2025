@@ -5,8 +5,9 @@ using UnityEngine.UI;
 using TMPro;
 
 //
-// 약한 시스템 공지
+// 위의 3초간 발생하는 메세지
 //
+
 public class UINoticeMsg : MonoBehaviour
 {
     public Image MsgBG;

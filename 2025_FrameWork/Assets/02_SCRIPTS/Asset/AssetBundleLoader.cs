@@ -9,7 +9,12 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceLocations;
 
 
-public class AssetBundleLoader : MonoBehaviour
+//만들고싶은거 
+//2. 업데이트 확인  번들 말고 ( 다른 방식 -> 강제 패치가 필요할 경우 ( 스토어 이동 , 게임 앞단 이동)
+//3. 아직 리소스 받지 않은 컨텐츠의 경우 라벨별로 다운로드
+
+
+public class AssetBundleLoader :MonoBehaviour
 {
     public static string InitDownloadURL;
     private StateMachine _BundleState;
@@ -50,6 +55,7 @@ public class AssetBundleLoader : MonoBehaviour
         //초기화
         _BundleInit.Transitions.Add(new StateTransition(_BundleCheckValid, () => _BundleInit.StateID == E_STATE_ID.ERROR));
         _BundleInit.Transitions.Add(new StateTransition(_BundleError, () => _BundleInit.StateID == E_STATE_ID.QUIT));
+        _BundleInit.Transitions.Add(new StateTransition(_BundleCheckValid, () => _BundleInit.StateID == E_STATE_ID.SUCCESS));
 
         //유효성체크 -> 실패시 초기화로 보낼줄 알아야함
         _BundleCheckValid.Transitions.Add(new StateTransition(_BundleInit, () => _BundleCheckValid.StateID == E_STATE_ID.ERROR));
@@ -77,14 +83,7 @@ public class AssetBundleLoader : MonoBehaviour
         _LoadToMemory.Transitions.Add(new StateTransition(_LoadToMemory_Complete, () => _LoadToMemory.StateID == E_STATE_ID.SUCCESS));
 
         //상태머신 초기화
-        if (AppDef.ASSET_BUNDLE_MODE)
-        {
-            _BundleState.SetInitialState(_BundleInit);
-        }
-        else
-        {
-            _BundleState.SetInitialState(_LoadToMemory);
-        }
+        _BundleState.SetInitialState(_BundleInit);
     }
 
 
@@ -179,7 +178,7 @@ public class AssetBundleLoader_Init : StateNode
     public async Task Init(CancellationToken cancellationToken)
     {
         // Addressables 초기화 요청
-        AsyncOperationHandle _Handle = Addressables.InitializeAsync();
+        AsyncOperationHandle _Handle = Addressables.InitializeAsync(true);
 
         try
         {
@@ -213,7 +212,6 @@ public class AssetBundleLoader_Init : StateNode
         finally
         {
             // 작업 핸들 해제
-            Addressables.Release(_Handle);
         }
 
         CanTransition = true;
@@ -259,7 +257,6 @@ public class AssetBundleLoader_CheckValid : StateNode
         else
         {
             Debug.LogError("Addressables initialization failed.");
-
             StateID = E_STATE_ID.ERROR;
         }
 
@@ -284,13 +281,21 @@ public class AssetBundleLoader_UpdateCatalog : StateNode
 
     public async Task Init(CancellationToken cancellationToken)
     {
-        // Check for catalog updates
-        AsyncOperationHandle<List<string>> checkHandle = Addressables.CheckForCatalogUpdates();
-
         try
         {
-            // 비동기 작업 대기 중 취소를 수동으로 처리
-            await Task.Run(() => checkHandle.Task, cancellationToken);
+            // Check for catalog updates
+            var checkHandle = Addressables.CheckForCatalogUpdates(true);
+
+            await checkHandle.Task;
+
+            if (checkHandle.IsValid()==false)
+            {
+                StateID = E_STATE_ID.SUCCESS; //TODO: 임시 해결을 못하곘음
+                return;
+
+                Debug.LogError($"Handle Status: {checkHandle.Status}");
+                Debug.LogError($"Operation Exception: {checkHandle.OperationException?.Message}");
+            }
 
             if (checkHandle.Status == AsyncOperationStatus.Succeeded)
             {
@@ -302,7 +307,7 @@ public class AssetBundleLoader_UpdateCatalog : StateNode
 
                     // Update catalogs
                     AsyncOperationHandle updateHandle = Addressables.UpdateCatalogs(catalogsToUpdate);
-                    await Task.Run(() => updateHandle.Task, cancellationToken); // 취소 가능 대기
+                    await updateHandle.Task;
 
                     if (updateHandle.Status == AsyncOperationStatus.Succeeded)
                     {
@@ -314,8 +319,6 @@ public class AssetBundleLoader_UpdateCatalog : StateNode
                         Debug.LogError("Failed to update catalogs.");
                         StateID = E_STATE_ID.ERROR;
                     }
-
-                    Addressables.Release(updateHandle);
                 }
                 else
                 {
@@ -343,11 +346,10 @@ public class AssetBundleLoader_UpdateCatalog : StateNode
         }
         finally
         {
-            Addressables.Release(checkHandle);
+            CanTransition = true;
         }
-
-        CanTransition = true;
     }
+
 
     // 종료 시 취소 처리
     public override void Exit()
@@ -498,7 +500,7 @@ public class AssetBundleLoader_DownloadBundles : StateNode
         long curDownloaded = 0;
 
         // 번들 다운로드 요청
-        AsyncOperationHandle downloadHandle = Addressables.DownloadDependenciesAsync(downloadLabels);
+        AsyncOperationHandle downloadHandle = Addressables.DownloadDependenciesAsync(downloadLabels, Addressables.MergeMode.Union);
 
         try
         {
@@ -546,8 +548,10 @@ public class AssetBundleLoader_DownloadBundles : StateNode
         }
         finally
         {
+            CanTransition = true;
             Addressables.Release(downloadHandle);
         }
+
 
         return curDownloaded;
     }
@@ -663,6 +667,7 @@ public class AssetBundleLoader_LoadToMemory : StateNode
         }
         finally
         {
+            CanTransition = true;
             Addressables.Release(asyncOperation);
         }
     }

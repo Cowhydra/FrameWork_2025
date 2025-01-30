@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using D_F_Enum;
 using UnityEngine.XR;
+using System.Threading.Tasks;
+using System.Collections;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public interface IDlgBoxOwner
 {
@@ -12,6 +15,8 @@ public interface IDlgBoxOwner
 
 public partial class UIScene : MonoBehaviour,IDlgBoxOwner
 {
+    private Coroutine _OpenDlgBoxCo;
+
     private class DlgBoxNode
     {
         public E_DLG_ID DlgBoxID;
@@ -81,43 +86,54 @@ public partial class UIScene : MonoBehaviour,IDlgBoxOwner
 
 
     // 대화상자 열기
-    public UIDlgBox OpenDlgBox(E_DLG_ID dlgBoxID, object dlgBoxVal, E_DLG_OPT opt = E_DLG_OPT.ShowCurrent, Action<UIDlgBox, int> onClose = null)
+    public void OpenDlgBox(E_DLG_ID dlgBoxID, object dlgBoxVal, E_DLG_OPT opt = E_DLG_OPT.ShowCurrent, Action<UIDlgBox, int> onClose = null)
+    {
+
+        _OpenDlgBoxCo = StartCoroutine(OpenDlgBoxCoroutine(dlgBoxID, dlgBoxVal, opt, onClose));
+       
+    }
+
+    // 코루틴 메서드
+    private IEnumerator OpenDlgBoxCoroutine(E_DLG_ID dlgBoxID, object dlgBoxVal, E_DLG_OPT opt, Action<UIDlgBox, int> onClose)
     {
         // 현재 Dlg과 같은 ID를 가진 Dlg를 연속해서 못 열게 함 (실수 방지)
         if (_CurrentNode != null && _CurrentNode.DlgBoxInst != null && _CurrentNode.DlgBoxID == dlgBoxID)
-        { 
-            return _CurrentNode.DlgBoxInst;
-        }
-
-        //로드
-        UIDlgBox dlgBoxInst = AssetServer.Load<UIDlgBox>(dlgBoxID.ToString());
-        if (dlgBoxInst == null)
         {
-            Debug.LogError($"TSUIScene.OpenDlg> Failed to Load prefab ({dlgBoxID})!!");
-            return null;
+            yield break; // 이미 동일한 Dlg가 열려있다면 아무것도 하지 않고 종료
         }
 
-        //노드생성
-        DlgBoxNode curNode = CreateNewNode(dlgBoxID, dlgBoxInst, dlgBoxVal, onClose);
+        // 로드
+        var handle = AssetServer.LoadAsync<GameObject>(dlgBoxID.ToString());
+        yield return handle; // 비동기 작업이 끝날 때까지 기다림
 
-        switch (opt)
+        if (handle.Result == null)
         {
-            case E_DLG_OPT.DestoryAll:
-                DestoryAllStack();
-                break;
-            case E_DLG_OPT.DestroyCurrent:
-                DestoryStack();
-                break;
-            case E_DLG_OPT.ShowCurrent:
-                break;
-            case E_DLG_OPT.HideCurrent:
-                HideNode();
-                break;
+            Debug.Log($"{dlgBoxID.ToString()} Cretate is Failed");
         }
+        else
+        {
+            UIDlgBox dlgBoxInst = AssetServer.Instantiate<UIDlgBox>(handle.Result);
 
-        AddNewNode(curNode);
+            // 노드 생성
+            DlgBoxNode curNode = CreateNewNode(dlgBoxID, dlgBoxInst, dlgBoxVal, onClose);
 
-        return dlgBoxInst;
+            switch (opt)
+            {
+                case E_DLG_OPT.DestoryAll:
+                    DestoryAllStack();
+                    break;
+                case E_DLG_OPT.DestroyCurrent:
+                    DestoryStack();
+                    break;
+                case E_DLG_OPT.ShowCurrent:
+                    break;
+                case E_DLG_OPT.HideCurrent:
+                    HideNode();
+                    break;
+            }
+
+            AddNewNode(curNode);
+        }
     }
 
 

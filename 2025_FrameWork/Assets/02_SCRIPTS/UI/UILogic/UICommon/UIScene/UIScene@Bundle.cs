@@ -1,7 +1,10 @@
 using System.Collections.Generic;
-using System.Drawing;
 using D_F_Enum;
 using UnityEngine;
+
+
+//고려할 것 
+// 1. 프리팹 하나마다 In
 
 public partial class UIScene : MonoBehaviour ,IBundleLoaderOwner
 {

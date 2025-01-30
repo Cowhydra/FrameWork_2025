@@ -6,7 +6,7 @@ public partial class BaseActor : MonoBehaviour
     //모든 행동은 강제플레이가 아니면 아이돌로
     private Animator _animator;
 
-    public void PlayAnimator(string anim)
+    public async void PlayAnimator(string anim)
     {
         if (_animator == null)
         {
@@ -17,7 +17,7 @@ public partial class BaseActor : MonoBehaviour
         {
             string path = GetAnimationPath(anim);
 
-            RuntimeAnimatorController rc = AssetServer.Load<RuntimeAnimatorController>(anim);
+            RuntimeAnimatorController rc =await AssetServer.LoadAsync<RuntimeAnimatorController>(anim);
 
             if (rc != null)
             {

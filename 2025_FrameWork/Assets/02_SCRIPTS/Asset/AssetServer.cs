@@ -1,12 +1,14 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 public static partial class AssetServer 
 {
     // 실제 로드된 리소스 
     // 하나의 Dictionary 으로 관리중이지만 나눌 필요는 있음
     public static Dictionary<string, UnityEngine.Object> TotalResourceDict { get; private set; } = new Dictionary<string, UnityEngine.Object>();
-
 
     public static bool AddResource(string key, UnityEngine.Object obj)
     {
@@ -21,18 +23,48 @@ public static partial class AssetServer
         }
     }
 
+    private static List<AsyncOperationHandle> _loadedHandles = new List<AsyncOperationHandle>();
 
-    #region 리소스 로드
-    public static T Load<T>(string key) where T : UnityEngine.Object
+
+    //항상 메모리에 로드되야 하는 주제들 --> 데이터들  등..
+    public static void LoadMemoryAlways(string label)
     {
-        if (TotalResourceDict.TryGetValue(key, out UnityEngine.Object resource) == true) 
-        {
-            return resource as T;
-        }
 
-        return null;
     }
 
+
+    #region 리소스 로드
+    // 비동기 리소스 로드 메서드 -- 스테이지 별로 몬스터나.. 씬 혹은 스테이지마다 메모리에 로드 및 제거할 것들은 여기에 넣어도 된다.
+    public static async Task<T> LoadAsync<T>(string key) where T : UnityEngine.Object
+    {
+        // 이미 로드된 리소스를 확인
+        if (TotalResourceDict.TryGetValue(key, out UnityEngine.Object resource))
+        {
+            return resource as T; // 리소스가 이미 로드되어 있으면 반환
+        }
+
+        // 리소스가 로드되지 않았다면 비동기적으로 로드
+        AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(key);
+
+        // 비동기적으로 로드가 완료될 때까지 기다림
+        await handle.Task;
+
+        if (handle.Status == AsyncOperationStatus.Succeeded)
+        {
+            TotalResourceDict[key] = handle.Result; // 리소스를 Dictionary에 저장
+            _loadedHandles.Add(handle);
+
+            Debug.Log($"Loaded resource: {key}");
+            Debug.Log($"loadedHandles Count: {_loadedHandles.Count}");
+
+            return handle.Result;
+        }
+        else
+        {
+            Debug.LogError($"Failed to load resource: {key}");
+            return null;
+        }
+    }
 
 
     public static T LoadFromResources<T>(string key) where T : UnityEngine.Object
@@ -49,26 +81,30 @@ public static partial class AssetServer
     }
 
 
-    public static GameObject Instantiate(string key, Transform parent = null, bool pooling = false)
+    public static async Task<GameObject> InstantiateAsync(string key, Transform parent = null, bool pooling = false)
     {
-        GameObject prefab = Load<GameObject>($"{key}");
+        // LoadAsync로 비동기적으로 리소스를 로드
+        GameObject prefab = await LoadAsync<GameObject>(key);
+
         if (prefab == null)
         {
-            Debug.LogError($"Failed to load prefab : {key}");
+            Debug.LogError($"Failed to load prefab: {key}");
             return null;
         }
 
+        // 풀링 사용 여부 체크
         if (pooling)
         {
-           return ObjectPool.Instance.Pop(prefab);
+            return ObjectPool.Instance.Pop(prefab);
         }
 
+        // 풀링을 사용하지 않는 경우 인스턴스를 생성
         GameObject go = UnityEngine.Object.Instantiate(prefab, parent);
         go.name = prefab.name;
         return go;
     }
 
-
+    #region 생성 
     public static GameObject Instantiate(GameObject resource, Transform parent = null, bool pooling = false)
     {
         if (resource == null)
@@ -88,6 +124,56 @@ public static partial class AssetServer
 
         return go;
     }
+
+
+    public static T Instantiate<T>(GameObject resource, Transform parent = null, bool pooling = false) where T:Component
+    {
+        if (resource == null)
+        {
+            Debug.LogError($"Prefab is Null");
+            return default(T);
+        }
+
+        if (pooling)
+        {
+            return ObjectPool.Instance.Pop(resource) as T;
+        }
+
+        GameObject go = UnityEngine.Object.Instantiate(resource, parent);
+
+        go.name = resource.name;
+
+        return go as T;
+    }
+
+
+    public static bool InstantiateAtLoaded(string label, Transform parent = null, bool pooling = false)
+    {
+        if (TotalResourceDict.ContainsKey(label) == false)
+        {
+            return false;
+        }
+
+        GameObject resource = TotalResourceDict[label] as GameObject;
+
+        if (resource == null)
+        {
+            Debug.LogError($"Prefab is Null");
+            return false;
+        }
+
+        if (pooling)
+        {
+            return ObjectPool.Instance.Pop(resource);
+        }
+
+        GameObject go = UnityEngine.Object.Instantiate(resource, parent);
+
+        go.name = resource.name;
+
+        return go;
+    }
+    #endregion
 
 
     public static void Destroy(GameObject go)
@@ -132,4 +218,15 @@ public static partial class AssetServer
         return component;
     }
     #endregion
+
+
+    // 리소스 해제 메서드
+    public static void Release(string key)
+    {
+        if (TotalResourceDict.TryGetValue(key, out UnityEngine.Object resource))
+        {
+            Addressables.Release(resource); // 메모리에서 해제
+            TotalResourceDict.Remove(key); // Dictionary에서 제거
+        }
+    }
 }

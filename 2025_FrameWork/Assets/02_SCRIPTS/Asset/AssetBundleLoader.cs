@@ -6,14 +6,12 @@ using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceLocations;
 
 
 public class AssetBundleLoader : MonoBehaviour
 {
     private IBundleLoaderOwner _Owner;
     private Coroutine _BundleDownLoadCoro;
-
 
     private void OnDisable()
     {
@@ -74,10 +72,10 @@ public class AssetBundleLoader : MonoBehaviour
         yield return DownloadBundles();
 
         // 5. 리소스 메모리 로드
-        yield return LoadResourcesToMemory();
+        //yield return LoadResourcesToMemory();
 
-        // 6. 완료 처리 -> 지금은 비동기처리중..
-        //_Owner.OnLoadToMemoryComplete();
+        // 6. 완료 처리 -> 메모리 강제 로드는 .. 총 용량이 작은 프로젝트 등에서 사용하면 좋은데 굳이..
+        _Owner.OnLoadToMemoryComplete();
     }
 
     // 1. Addressables 초기화
@@ -198,12 +196,13 @@ public class AssetBundleLoader : MonoBehaviour
 
     //        foreach (var location in locationHandle.Result)
     //        {
-    //            AsyncOperationHandle<UnityEngine.Object> loadHandle = Addressables.LoadAssetAsync<UnityEngine.Object>(location.PrimaryKey,f);
+    //            AsyncOperationHandle<UnityEngine.Object> loadHandle = Addressables.LoadAssetAsync<UnityEngine.Object>(location.PrimaryKey, f);
     //            yield return loadHandle;
 
     //            if (loadHandle.Status == AsyncOperationStatus.Succeeded)
     //            {
     //                loadedCount++;
+    //                AssetServer.AddResource(location.PrimaryKey, loadHandle.Result);
     //                _Owner.OnLoadMemoryAction(location.PrimaryKey, loadedCount, totalCount);
     //                Debug.Log($"Loaded: {location.PrimaryKey}");
     //            }
@@ -262,6 +261,7 @@ public class AssetBundleLoader : MonoBehaviour
         {
             Debug.Log($"Loaded: {primaryKey} ({loadedCount}/{totalCount})");
 
+            AssetServer.AddResource(primaryKey, loadHandle.Result);
             _Owner.OnLoadMemoryAction(primaryKey, loadedCount, totalCount); 
         }
         else

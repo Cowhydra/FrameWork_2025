@@ -45,29 +45,38 @@ public partial class UIScene : MonoBehaviour ,IBundleLoaderOwner
     {
         _TotalBundleDownloadSize = size;
 
-        //여기서 동의박스 해서 하면 흐름 이어줘야함 여기도 YES/NO 박스 필요
-        Current.OpenYesNoMsgBox(string.Format("번들 다운로드 하시곘습니까? :{0}", size.ToString()), null, 0,
+        //낮은거의 경우 그냥 다운로드
+        if (size <= 1)
+        {
+            _BundleDownloadAgree = E_BUNDLE_DOWNLOAD_STATE.AGREE;
 
-            (uimsgbox, btnid) =>
-            {
-                if (btnid == UIMsgBox_YesNo.BT_YES)
+        }
+        else
+        {
+            //여기서 동의박스 해서 하면 흐름 이어줘야함 여기도 YES/NO 박스 필요
+            Current.OpenYesNoMsgBox(string.Format("번들 다운로드 하시곘습니까? :{0}", size.ToString()), null, 0,
+
+                (uimsgbox, btnid) =>
                 {
-                    if (BundleUtil.IsDiskSpaceEnough(size) == false)
+                    if (btnid == UIMsgBox_YesNo.BT_YES)
                     {
-                        OnBundlerEnterError(E_BUNDLE_DOWNLOAD_ERROR.SAVE_STORAGE_NOT_ENOUGH);
+                        if (BundleUtil.IsDiskSpaceEnough(size) == false)
+                        {
+                            OnBundlerEnterError(E_BUNDLE_DOWNLOAD_ERROR.SAVE_STORAGE_NOT_ENOUGH);
+                        }
+                        else
+                        {
+                            _BundleDownloadAgree = E_BUNDLE_DOWNLOAD_STATE.AGREE;
+                        }
                     }
                     else
                     {
-                        _BundleDownloadAgree = E_BUNDLE_DOWNLOAD_STATE.AGREE;
+                        _BundleDownloadAgree = E_BUNDLE_DOWNLOAD_STATE.DISAGREE;
+                        OnBundlerEnterError(E_BUNDLE_DOWNLOAD_ERROR.USER_CANCEL);
                     }
                 }
-                else
-                {
-                    _BundleDownloadAgree = E_BUNDLE_DOWNLOAD_STATE.DISAGREE;
-                    OnBundlerEnterError(E_BUNDLE_DOWNLOAD_ERROR.USER_CANCEL);
-                }
-            }
-            );
+                );
+        }
     }
 
 

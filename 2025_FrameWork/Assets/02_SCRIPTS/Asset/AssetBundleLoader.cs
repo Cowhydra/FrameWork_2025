@@ -58,8 +58,7 @@ public class AssetBundleLoader : MonoBehaviour
         yield return UpdateCatalogs();
 
         // 3. 다운로드 크기 계산
-        long downloadSize = 0;
-        yield return CalculateDownloadSize(size => downloadSize = size);
+        yield return CalculateDownloadSize();
 
         yield return new WaitUntil(() => _Owner.AgreeBundleDownLoad != D_F_Enum.E_BUNDLE_DOWNLOAD_STATE.NONE);
 
@@ -140,7 +139,7 @@ public class AssetBundleLoader : MonoBehaviour
 
 
     // 3. 다운로드 크기 계산
-    private IEnumerator CalculateDownloadSize(Action<long> onSizeCalculated)
+    private IEnumerator CalculateDownloadSize()
     {
         AsyncOperationHandle<long> sizeHandle = Addressables.GetDownloadSizeAsync(_Owner.BundleLabels);
         yield return sizeHandle;
@@ -150,7 +149,7 @@ public class AssetBundleLoader : MonoBehaviour
             long totalSize = sizeHandle.Result;
             Debug.Log($"Total download size: {totalSize} bytes");
             _Owner.TotalDownLoadBundleSize = totalSize;
-            onSizeCalculated?.Invoke(totalSize);
+            _Owner.OnBundleSizeAction(totalSize);
         }
         else
         {

@@ -521,6 +521,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 952653920372171416, guid: 77becab15b56a284a99d47d416df4f55, type: 3}
+      propertyPath: m_Name
+      value: SliderMsg
+      objectReference: {fileID: 0}
+    - target: {fileID: 952653920372171416, guid: 77becab15b56a284a99d47d416df4f55, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3516498124915398738, guid: 77becab15b56a284a99d47d416df4f55, type: 3}
       propertyPath: m_SizeDelta.x
       value: 480.69

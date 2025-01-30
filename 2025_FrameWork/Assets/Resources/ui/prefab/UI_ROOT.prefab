@@ -763,7 +763,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6409862814837894704, guid: 6ce559c1feba9814988cc423f95d4d08, type: 3}
       propertyPath: m_Name
-      value: ui_slider_msg
+      value: SliderMsg
       objectReference: {fileID: 0}
     - target: {fileID: 6409862814837894704, guid: 6ce559c1feba9814988cc423f95d4d08, type: 3}
       propertyPath: m_IsActive

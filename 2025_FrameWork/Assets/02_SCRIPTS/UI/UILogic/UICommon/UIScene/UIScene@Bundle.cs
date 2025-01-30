@@ -98,7 +98,7 @@ public partial class UIScene : MonoBehaviour ,IBundleLoaderOwner
 
     void IBundleLoaderOwner.OnLoadMemoryAction(string label, int loadCount, int totalCount)
     {
-        Current.InitSliderMsg($"메모리로드중 다운로드중.. 주제 :{label}:{loadCount}/{totalCount}");
+        Current.InitSliderMsg($"메모리에 적재중 ! :{loadCount}/{totalCount}");
         Current.UpdateSliderProgress((float)loadCount / totalCount);
     }
 

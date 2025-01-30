@@ -20,7 +20,6 @@ public class UISliderMsg : MonoBehaviour
 
         _TitleLabel.SetActiveEx(true);
         _PercentLbl.SetActiveEx(false);
-        _TitleLabel.SetActiveEx(false);
     }
 
 

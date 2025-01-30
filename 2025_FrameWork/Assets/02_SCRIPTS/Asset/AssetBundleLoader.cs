@@ -1,6 +1,8 @@
-using System;
+Ôªøusing System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -51,13 +53,13 @@ public class AssetBundleLoader : MonoBehaviour
             yield break;
         }
 
-        // 1. Addressables √ ±‚»≠
+        // 1. Addressables Ï¥àÍ∏∞Ìôî
         yield return InitializeAddressables();
 
-        // 2. ƒ´≈ª∑Œ±◊ æ˜µ•¿Ã∆Æ »Æ¿Œ
+        // 2. Ïπ¥ÌÉàÎ°úÍ∑∏ ÏóÖÎç∞Ïù¥Ìä∏ ÌôïÏù∏
         yield return UpdateCatalogs();
 
-        // 3. ¥ŸøÓ∑ŒµÂ ≈©±‚ ∞ËªÍ
+        // 3. Îã§Ïö¥Î°úÎìú ÌÅ¨Í∏∞ Í≥ÑÏÇ∞
         yield return CalculateDownloadSize();
 
         yield return new WaitUntil(() => _Owner.AgreeBundleDownLoad != D_F_Enum.E_BUNDLE_DOWNLOAD_STATE.NONE);
@@ -68,17 +70,17 @@ public class AssetBundleLoader : MonoBehaviour
             yield break;
         }
 
-        // 4. ¥ŸøÓ∑ŒµÂ ¡¯«‡
+        // 4. Îã§Ïö¥Î°úÎìú ÏßÑÌñâ
         yield return DownloadBundles();
 
-        // 5. ∏Æº“Ω∫ ∏ﬁ∏∏Æ ∑ŒµÂ
+        // 5. Î¶¨ÏÜåÏä§ Î©îÎ™®Î¶¨ Î°úÎìú
         yield return LoadResourcesToMemory();
 
-        // 6. øœ∑· √≥∏Æ
-        _Owner.OnLoadToMemoryComplete();
+        // 6. ÏôÑÎ£å Ï≤òÎ¶¨ -> ÏßÄÍ∏àÏùÄ ÎπÑÎèôÍ∏∞Ï≤òÎ¶¨Ï§ë..
+        //_Owner.OnLoadToMemoryComplete();
     }
 
-    // 1. Addressables √ ±‚»≠
+    // 1. Addressables Ï¥àÍ∏∞Ìôî
     private IEnumerator InitializeAddressables()
     {
         AsyncOperationHandle initHandle = Addressables.InitializeAsync(false);
@@ -98,7 +100,7 @@ public class AssetBundleLoader : MonoBehaviour
     }
 
 
-    // 2. ƒ´≈ª∑Œ±◊ æ˜µ•¿Ã∆Æ »Æ¿Œ
+    // 2. Ïπ¥ÌÉàÎ°úÍ∑∏ ÏóÖÎç∞Ïù¥Ìä∏ ÌôïÏù∏
     private IEnumerator UpdateCatalogs()
     {
         AsyncOperationHandle<List<string>> checkHandle = Addressables.CheckForCatalogUpdates(false);
@@ -138,7 +140,7 @@ public class AssetBundleLoader : MonoBehaviour
     }
 
 
-    // 3. ¥ŸøÓ∑ŒµÂ ≈©±‚ ∞ËªÍ
+    // 3. Îã§Ïö¥Î°úÎìú ÌÅ¨Í∏∞ Í≥ÑÏÇ∞
     private IEnumerator CalculateDownloadSize()
     {
         AsyncOperationHandle<long> sizeHandle = Addressables.GetDownloadSizeAsync(_Owner.BundleLabels);
@@ -160,7 +162,7 @@ public class AssetBundleLoader : MonoBehaviour
         Addressables.Release(sizeHandle);
     }
 
-    // 4. π¯µÈ ¥ŸøÓ∑ŒµÂ
+    // 4. Î≤àÎì§ Îã§Ïö¥Î°úÎìú
     private IEnumerator DownloadBundles()
     {
         AsyncOperationHandle downloadHandle = Addressables.DownloadDependenciesAsync(_Owner.BundleLabels, Addressables.MergeMode.Union);
@@ -183,40 +185,95 @@ public class AssetBundleLoader : MonoBehaviour
     }
 
 
-    // 5. ∏Æº“Ω∫ ∏ﬁ∏∏Æ ∑ŒµÂ
-    private IEnumerator LoadResourcesToMemory()
+    // 5. Î¶¨ÏÜåÏä§ Î©îÎ™®Î¶¨ Î°úÎìú
+    //private IEnumerator LoadResourcesToMemory()
+    //{
+    //    AsyncOperationHandle<IList<IResourceLocation>> locationHandle = Addressables.LoadResourceLocationsAsync(_Owner.BundleLabels, Addressables.MergeMode.Union, typeof(UnityEngine.Object));
+    //    yield return locationHandle;
+
+    //    if (locationHandle.Status == AsyncOperationStatus.Succeeded)
+    //    {
+    //        int totalCount = locationHandle.Result.Count;
+    //        int loadedCount = 0;
+
+    //        foreach (var location in locationHandle.Result)
+    //        {
+    //            AsyncOperationHandle<UnityEngine.Object> loadHandle = Addressables.LoadAssetAsync<UnityEngine.Object>(location.PrimaryKey,f);
+    //            yield return loadHandle;
+
+    //            if (loadHandle.Status == AsyncOperationStatus.Succeeded)
+    //            {
+    //                loadedCount++;
+    //                _Owner.OnLoadMemoryAction(location.PrimaryKey, loadedCount, totalCount);
+    //                Debug.Log($"Loaded: {location.PrimaryKey}");
+    //            }
+    //            else
+    //            {
+    //                Debug.LogError($"Failed to load: {location.PrimaryKey}");
+    //            }
+
+    //            Addressables.Release(loadHandle);
+    //        }
+    //    }
+    //    else
+    //    {
+    //        GetError(D_F_Enum.E_BUNDLE_DOWNLOAD_ERROR.MEMORYLOAD_ERR);
+    //        Debug.LogError("Failed to load resource locations!");
+    //    }
+    //}
+
+
+    private async Task LoadResourcesToMemory()
     {
-        AsyncOperationHandle<IList<IResourceLocation>> locationHandle = Addressables.LoadResourceLocationsAsync(_Owner.BundleLabels, Addressables.MergeMode.Union, typeof(UnityEngine.Object));
-        yield return locationHandle;
+        var locationHandle = Addressables.LoadResourceLocationsAsync(_Owner.BundleLabels, Addressables.MergeMode.Union, typeof(UnityEngine.Object));
+        await locationHandle.Task;
 
-        if (locationHandle.Status == AsyncOperationStatus.Succeeded)
+        if (!locationHandle.IsValid() || locationHandle.Status != AsyncOperationStatus.Succeeded || locationHandle.Result == null || locationHandle.Result.Count == 0)
         {
-            int totalCount = locationHandle.Result.Count;
-            int loadedCount = 0;
+            Debug.LogError($"Failed to load resource locations! Error: {locationHandle.OperationException?.Message}");
+            return;
+        }
 
-            foreach (var location in locationHandle.Result)
-            {
-                AsyncOperationHandle<UnityEngine.Object> loadHandle = Addressables.LoadAssetAsync<UnityEngine.Object>(location.PrimaryKey);
-                yield return loadHandle;
+        Debug.Log($"Found {locationHandle.Result.Count} resources. Starting parallel load...");
 
-                if (loadHandle.Status == AsyncOperationStatus.Succeeded)
-                {
-                    loadedCount++;
-                    _Owner.OnLoadMemoryAction(location.PrimaryKey, loadedCount, totalCount);
-                    Debug.Log($"Loaded: {location.PrimaryKey}");
-                }
-                else
-                {
-                    Debug.LogError($"Failed to load: {location.PrimaryKey}");
-                }
+        List<Task> loadTasks = new List<Task>();
 
-                Addressables.Release(loadHandle);
-            }
+        int totalCount = locationHandle.Result.Count;
+        int loadedCount = 0; 
+
+        foreach (var location in locationHandle.Result)
+        {
+            loadTasks.Add(LoadAssetAsync(location.PrimaryKey, totalCount, () => Interlocked.Increment(ref loadedCount)));
+        }
+
+        await Task.WhenAll(loadTasks);
+
+        Debug.Log("All resources loaded!");
+    }
+
+    private async Task LoadAssetAsync(string primaryKey, int totalCount, Func<int> onLoaded)
+    {
+        var loadHandle = Addressables.LoadAssetAsync<UnityEngine.Object>(primaryKey);
+        await loadHandle.Task;
+
+        int loadedCount = onLoaded();
+
+        if (loadHandle.Status == AsyncOperationStatus.Succeeded)
+        {
+            Debug.Log($"Loaded: {primaryKey} ({loadedCount}/{totalCount})");
+
+            _Owner.OnLoadMemoryAction(primaryKey, loadedCount, totalCount); 
         }
         else
         {
-            GetError(D_F_Enum.E_BUNDLE_DOWNLOAD_ERROR.MEMORYLOAD_ERR);
-            Debug.LogError("Failed to load resource locations!");
+            Debug.LogError($"Failed to load asset: {primaryKey} | Error: {loadHandle.OperationException?.Message}");
+        }
+
+        Addressables.Release(loadHandle);
+
+        if (loadedCount == totalCount)
+        {
+            _Owner.OnLoadToMemoryComplete();
         }
     }
 }

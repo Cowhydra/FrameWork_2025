@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Drawing;
+using D_F_Enum;
 using UnityEngine;
 
 public partial class UIScene : MonoBehaviour ,IBundleLoaderOwner
@@ -7,12 +8,24 @@ public partial class UIScene : MonoBehaviour ,IBundleLoaderOwner
     private long _TotalBundleDownloadSize = 0;
     [SerializeField] private AssetBundleLoader _AssetBundleLoader;
 
-    protected List<string> _BundleLabels = new List<string>() { "ui", "model", "data", "animation" };
+    protected List<string> _BundleLabels;
     public List<string> BundleLabels { get => _BundleLabels; }
 
+    protected long _TotaBundleSize;
+    public long TotalDownLoadBundleSize { get => _TotaBundleSize; set => _TotaBundleSize=value; }
 
-    public AssetBundleLoader GetBundleLoader()
+    public E_BUNDLE_DOWNLOAD_STATE AgreeBundleDownLoad => _BundleDownloadAgree;
+
+    protected E_BUNDLE_DOWNLOAD_STATE _BundleDownloadAgree = E_BUNDLE_DOWNLOAD_STATE.NONE;
+
+
+    public AssetBundleLoader GetBundleLoader(List<string> bundleLabels)
     {
+        //초기화 위치 고민
+        _BundleDownloadAgree = E_BUNDLE_DOWNLOAD_STATE.NONE;
+        _BundleLabels = bundleLabels;
+
+
         if (_AssetBundleLoader != null)
         {
             return _AssetBundleLoader;
@@ -41,19 +54,17 @@ public partial class UIScene : MonoBehaviour ,IBundleLoaderOwner
                 {
                     if (BundleUtil.IsDiskSpaceEnough(size) == false)
                     {
-                        OnBundlerEnterError(-1);
+                        OnBundlerEnterError(E_BUNDLE_DOWNLOAD_ERROR.SAVE_STORAGE_NOT_ENOUGH);
                     }
                     else
                     {
-                        if (_AssetBundleLoader != null)
-                        {
-                            _AssetBundleLoader.AgreeDownLoad();
-                        }
+                        _BundleDownloadAgree = E_BUNDLE_DOWNLOAD_STATE.AGREE;
                     }
                 }
                 else
                 {
-                    OnBundlerEnterError(-2);
+                    _BundleDownloadAgree = E_BUNDLE_DOWNLOAD_STATE.DISAGREE;
+                    OnBundlerEnterError(E_BUNDLE_DOWNLOAD_ERROR.USER_CANCEL);
                 }
             }
             );
@@ -84,8 +95,13 @@ public partial class UIScene : MonoBehaviour ,IBundleLoaderOwner
 
 
 
-    void OnBundlerEnterError(int errocde)
+    void OnBundlerEnterError(D_F_Enum.E_BUNDLE_DOWNLOAD_ERROR errocde)
     {
+        if (_AssetBundleLoader != null)
+        {
+            _AssetBundleLoader.StopBundlesDownLoadLogic();
+        }
+
         //시작씬으로 보내야함  메세지 출력 후 
         Current.OpenOKMsgBox($" 번들 다운로드 Error : {errocde}", null, 0,
             (msgbox, btnid) =>
@@ -102,7 +118,8 @@ public partial class UIScene : MonoBehaviour ,IBundleLoaderOwner
         SceneLoader.LoadScene(D_F_Enum.SCENE_NAME.Lobby);
     }
 
-    void IBundleLoaderOwner.OnBundlerEnterError(int errocde)
+
+    void IBundleLoaderOwner.OnBundlerEnterError(D_F_Enum.E_BUNDLE_DOWNLOAD_ERROR errocde)
     {
         OnBundlerEnterError(errocde);
     }

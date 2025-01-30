@@ -35,7 +35,7 @@ public class PatchScene : UIScene
         yield return null;
 
         // 애셋 번들 로딩
-        GetBundleLoader().Initalize(this);
+        GetBundleLoader(new List<string>() { "ui", "model", "data", "animation" }).Initalize(this);
     }
 
 

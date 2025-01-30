@@ -1,5 +1,6 @@
 ﻿using D_F_Enum;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public partial class UIScene : MonoBehaviour
 {
@@ -27,8 +28,8 @@ public partial class UIScene : MonoBehaviour
     // 안드로이드 백 버튼 처리
     private void HandleABB()
     {
-        if (!Input.GetKeyUp(KeyCode.Escape))
-        { 
+        if (!Keyboard.current.escapeKey.wasReleasedThisFrame)
+        {
             return;
         }
 

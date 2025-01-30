@@ -29,12 +29,6 @@ public static partial class AssetServer
         {
             return resource as T;
         }
-        else
-        {
-            //TODO:임시이며 따로 로딩 해야함.. 라벨 단위로.,.
-            AssetBundleLoader_LoadToMemory loader = new AssetBundleLoader_LoadToMemory(key, new List<string>() { key }, null);
-            loader.Enter();
-        }
 
         return null;
     }
@@ -70,30 +64,6 @@ public static partial class AssetServer
         }
 
         GameObject go = UnityEngine.Object.Instantiate(prefab, parent);
-
-        go.name = prefab.name;
-        return go;
-    }
-
-
-
-    public static GameObject InstantiateFromResource(string key, Transform parent = null, bool pooling = false)
-    {
-        GameObject prefab = LoadFromResources<GameObject>($"{key}");
-
-        if (prefab == null)
-        {
-            Debug.LogError($"Failed to load prefab : {key}");
-            return null;
-        }
-
-        if (pooling)
-        {
-            return ObjectPool.Instance.Pop(prefab);
-        }
-
-        GameObject go = UnityEngine.Object.Instantiate(prefab, parent);
-
         go.name = prefab.name;
         return go;
     }

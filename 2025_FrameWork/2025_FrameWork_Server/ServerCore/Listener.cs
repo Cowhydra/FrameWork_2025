@@ -31,7 +31,12 @@ namespace ServerCore
         {
             args.AcceptSocket = null;
 
-            bool? pending = _listenSocket?.AcceptAsync(args);
+            if (_listenSocket == null)
+            {
+                return;
+            }
+
+            bool pending = _listenSocket.AcceptAsync(args);
             if (pending == false)
             {
                 OnAcceptCompleted(null, args);
@@ -41,18 +46,34 @@ namespace ServerCore
 
         void OnAcceptCompleted(object? sender, SocketAsyncEventArgs args)
         {
-            if (args.SocketError == SocketError.Success)
+            try
             {
-                Session session = _sessionFactory.Invoke();
-                session.Start(args.AcceptSocket!);
-                session.OnConnected(args.AcceptSocket!.RemoteEndPoint!);
-            }
-            else
-            {
-                Console.WriteLine(args.SocketError.ToString());
-            }
+                if (args.SocketError == SocketError.Success)
+                {  // AcceptSocket이 null이 아님을 확신
+                    Socket acceptedSocket = args.AcceptSocket!;
 
-            RegisterAccept(args);
+                    // 소켓이 Dispose되기 전에 원격 엔드포인트 정보를 가져옴
+                    EndPoint remoteEndPoint = acceptedSocket.RemoteEndPoint!;
+
+                    Session session = _sessionFactory.Invoke();
+                    session.Start(acceptedSocket);
+                    session.OnConnected(remoteEndPoint!);
+                }
+                else
+                {
+                    Console.WriteLine(args.SocketError.ToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"OnAcceptCompleted 예외: {ex}");
+            }
+            finally
+            {
+                // AcceptSocket을 초기화하여 재사용 시 문제 없게 함
+                args.AcceptSocket = null;
+                RegisterAccept(args);
+            }
         }
     }
 }

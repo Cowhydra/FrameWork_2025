@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 using ServerCore;
 
 namespace _2025_FrameWork_Server
@@ -11,18 +6,28 @@ namespace _2025_FrameWork_Server
     //서버가 클라이언트에게 받은 부분
     public class ClientSession : PacketSession
     {
-        public enum PACKET_ID :ushort
+        //ushort -> 2바이트
+        //int - > 4바이트 
+
+        public enum N_E_PACKET_ID :ushort
         {
-           
+           CONNECT=1,
+
+        }
+
+        public enum N_E_LOGIN_TYPE : ushort
+        {
+            EDITOR=1,
+            GOOGLE=2,
+            APPLE=3,
         }
 
 
         public override void OnConnected(EndPoint endPoint)
         {
             Console.WriteLine($"OnConnected : {endPoint}");
-            Thread.Sleep(5000);
-            DisConnect();
         }
+
 
         public override void OnRecvPacket(ArraySegment<byte> buffer)
         {
@@ -33,8 +38,13 @@ namespace _2025_FrameWork_Server
             ushort id = BitConverter.ToUInt16(buffer.Array!, buffer.Offset + offset);
             offset += 2;
 
-            switch ((PACKET_ID)id)
+            switch ((N_E_PACKET_ID)id)
             {
+                case N_E_PACKET_ID.CONNECT:
+                    ushort loginmethod = BitConverter.ToUInt16(buffer.Array!, buffer.Offset + offset);
+                    offset += 2;
+                    Console.WriteLine($"loginmethod: {(N_E_LOGIN_TYPE)loginmethod}");
+                    break;
                 default:
                     break;
             }

@@ -16,8 +16,16 @@ public class Program
         // -- 서버 로컬 주소 --
         string host = Dns.GetHostName();
         IPHostEntry ipHost = Dns.GetHostEntry(host);
-        IPAddress ipAddr = ipHost.AddressList[0];
-        IPEndPoint endPoint = new IPEndPoint(ipAddr, 10001);
+        IPAddress? ipAddr = null;
+        foreach (IPAddress addr in ipHost.AddressList)
+        {
+            if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+            {
+                ipAddr = addr;
+                break;
+            }
+        }
+        IPEndPoint endPoint = new IPEndPoint(ipAddr!, 54321);
 
         Listener _listener = new Listener(endPoint,
             () => 

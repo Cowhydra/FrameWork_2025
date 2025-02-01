@@ -112,6 +112,7 @@ namespace ServerCore
         object _lock = new object();
         SocketAsyncEventArgs _sendArgs = new SocketAsyncEventArgs();
         SocketAsyncEventArgs _recvArgs = new SocketAsyncEventArgs();
+        private bool _pending = false;
 
         //연결 성공
         public abstract void OnConnected(EndPoint endPoint);
@@ -126,8 +127,13 @@ namespace ServerCore
         public void Start(Socket? socket)
         {
             _socket = socket;
+
+            BufferManager.Instance.SetBuffer(_sendArgs);
+            BufferManager.Instance.SetBuffer(_recvArgs);
+
             _recvArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnRecvCompleted);
             _sendArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnSendCompleted);
+
             RegisterRecv();
         }
 
@@ -137,7 +143,7 @@ namespace ServerCore
             lock (_lock)
             {
                 _sendQueue.Enqueue(sendBuffer);
-                if (_sendArgs.BufferList!.Count == 0)
+                if (_pending == false) 
                 {
                     RegsiterSend();
                 }
@@ -147,6 +153,7 @@ namespace ServerCore
 
         void RegsiterSend()
         {
+            _pending = true;
             while (_sendQueue.Count > 0)
             {
                 ArraySegment<byte> buff = _sendQueue.Dequeue();
@@ -165,6 +172,7 @@ namespace ServerCore
         {
             lock (_lock)
             {
+                _pending = false;
                 if (args.BytesTransferred > 0 && args.SocketError == SocketError.Success)
                 {
                     try
@@ -195,6 +203,11 @@ namespace ServerCore
         #region 패킷을 받았음
         void RegisterRecv()
         {
+            if (_disconnected == 1)
+            {
+                return;
+            }
+
             if (_socket == null)
             {
                 return;
@@ -231,6 +244,8 @@ namespace ServerCore
                 {
                     Console.WriteLine($" OnRecvCompleted Errror -> {e.Message}");
                 }
+
+                RegisterRecv();
             }
             else
             {
@@ -249,6 +264,7 @@ namespace ServerCore
                 return;
             }
 
+            Console.WriteLine($"DisConnect-> {_socket!.RemoteEndPoint}" );
             _socket?.Shutdown(SocketShutdown.Both);
             _socket?.Close();
         }

@@ -26,13 +26,6 @@ public static partial class AssetServer
     private static List<AsyncOperationHandle> _loadedHandles = new List<AsyncOperationHandle>();
 
 
-    //항상 메모리에 로드되야 하는 주제들 --> 데이터들  등..
-    public static void LoadMemoryAlways(string label)
-    {
-
-    }
-
-
     #region 리소스 로드
     // 비동기 리소스 로드 메서드 -- 스테이지 별로 몬스터나.. 씬 혹은 스테이지마다 메모리에 로드 및 제거할 것들은 여기에 넣어도 된다.
     public static async Task<T> LoadAsync<T>(string key) where T : UnityEngine.Object

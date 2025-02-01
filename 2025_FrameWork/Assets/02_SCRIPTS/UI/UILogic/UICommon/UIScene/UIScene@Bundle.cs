@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using D_F_Enum;
 using UnityEngine;
 
-
 //고려할 것 
 // 1. 프리팹 하나마다 In
 
@@ -20,6 +19,15 @@ public partial class UIScene : MonoBehaviour ,IBundleLoaderOwner
     public E_BUNDLE_DOWNLOAD_STATE AgreeBundleDownLoad => _BundleDownloadAgree;
 
     protected E_BUNDLE_DOWNLOAD_STATE _BundleDownloadAgree = E_BUNDLE_DOWNLOAD_STATE.NONE;
+
+
+    //항상 메모리에 로드되야 하는 주제들 --> 데이터들  등..
+    public void LoadMemoryAlways(List<string> labels)
+    {
+        //우선 번들 다운로드가 끝나면 한번 더 강제적으로 실행 ( 메모리 올려야할 것들)
+        //이미 받은 번들이라면 메세지가 안뜰 것이고.. 업데이트 내용이 있으면 뜰것..
+        GetBundleLoader(labels).Initalize(this, true);
+    }
 
 
     public AssetBundleLoader GetBundleLoader(List<string> bundleLabels)

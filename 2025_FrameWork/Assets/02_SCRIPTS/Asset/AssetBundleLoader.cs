@@ -12,6 +12,7 @@ public class AssetBundleLoader : MonoBehaviour
 {
     private IBundleLoaderOwner _Owner;
     private Coroutine _BundleDownLoadCoro;
+    private bool _LoadToMemory;
 
     private void OnDisable()
     {
@@ -26,12 +27,13 @@ public class AssetBundleLoader : MonoBehaviour
     }
 
 
-    public void Initalize(IBundleLoaderOwner owner)
+    public void Initalize(IBundleLoaderOwner owner,bool loadToMemory=false)
     {
         StopBundlesDownLoadLogic();
 
         _Owner = owner;
         _BundleDownLoadCoro = StartCoroutine(LoadAssetBundles());
+        _LoadToMemory = loadToMemory;
     }
 
 
@@ -72,10 +74,19 @@ public class AssetBundleLoader : MonoBehaviour
         yield return DownloadBundles();
 
         // 5. 리소스 메모리 로드
-        //yield return LoadResourcesToMemory();
-
-        // 6. 완료 처리 -> 메모리 강제 로드는 .. 총 용량이 작은 프로젝트 등에서 사용하면 좋은데 굳이..
-        _Owner.OnLoadToMemoryComplete();
+        if (_LoadToMemory == true)
+        {
+            //(임시)
+            //awiat 하면 async 붙여야해서.. 그냥 여기서 함수 실행하고 던진다.
+            //LoadResourcesToMemory 내부에서 OnLoadToMemoryComplete 실행 
+            yield return LoadResourcesToMemory();
+        }
+        else
+        {
+            // 6. 완료 처리 -> 메모리 강제 로드는 .. 총 용량이 작은 프로젝트 등에서 사용하면 좋은데 굳이..
+            _Owner.OnLoadToMemoryComplete();
+        }
+     
     }
 
     // 1. Addressables 초기화

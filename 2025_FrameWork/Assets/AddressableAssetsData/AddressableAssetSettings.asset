@@ -63,6 +63,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b93cc6b083371d14c8ad4c476b1f6c23, type: 2}
   - {fileID: 11400000, guid: 6a2dfd48f06a72a49a292e91e6f7c817, type: 2}
   - {fileID: 11400000, guid: 38d8445724a1c9645b7c804adda53fbe, type: 2}
+  - {fileID: 11400000, guid: bae9986e19b3c5443857c0ec5881e506, type: 2}
   m_BuildSettings:
     m_LogResourceManagerExceptions: 1
     m_BundleBuildPath: Temp/com.unity.addressables/AssetBundles
@@ -134,6 +135,7 @@ MonoBehaviour:
     - ui
     - data
     - animation
+    - zone
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 11fbba9354d83e54588285bc488a8254, type: 2}

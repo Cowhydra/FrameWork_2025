@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 
@@ -50,48 +51,48 @@ namespace ServerCore
         {
             int processLen = 0;
 
-            for (int i = bufferList.Count - 1; i >= 0; --i)
+            for (int i = 0; i < bufferList.Count; i++)
             {
-                ArraySegment<byte> buffer = bufferList[i];
+                var segment = bufferList[i];
 
-                // 최소한 헤더는 파싱할 수 있는지 확인
-                while (buffer.Count >= SystemDef.HEADER_SIZE)
+                while (_writeOffset - _readOffset >= SystemDef.HEADER_SIZE)
                 {
-                    // 헤더에서 패킷 크기 확인
-                    ushort dataSize = BitConverter.ToUInt16(buffer.Array!, buffer.Offset);
+                    // 현재 ReadPos에서 패킷 크기 읽기
+                    ushort dataSize = BitConverter.ToUInt16(segment.Array!, segment.Offset + (_readOffset - segment.Offset));
 
-                    // 패킷이 완전한지 확인
-                    if (buffer.Count < dataSize)
-                    {
-                        break; // 패킷이 불완전하면 더 이상 읽지 않고 멈춤
-                    }
-
-                    // 패킷이 완전하면 처리
-                    OnRecvPacket(new ArraySegment<byte>(buffer.Array!, buffer.Offset, dataSize));
-
-                    // 처리된 데이터 크기만큼 버퍼에서 제거
-                    processLen += dataSize;
-
-                    // 나머지 데이터 처리 - 처리된 만큼 버퍼를 갱신
-                    int remainingDataSize = buffer.Count - dataSize;
-                    buffer = new ArraySegment<byte>(buffer.Array!, buffer.Offset + dataSize, remainingDataSize);
-
-                    // 더 이상 처리할 데이터가 없으면 중단
-                    if (buffer.Count < SystemDef.HEADER_SIZE)
+                    // 패킷이 완전하지 않다면 break
+                    if (_writeOffset - _readOffset < dataSize)
                     {
                         break;
                     }
-                }
 
-                // 남은 데이터가 있을 경우 bufferList에 갱신
-                if (buffer.Count > 0)
-                {
-                    bufferList[i] = buffer;
-                }
-                else
-                {
-                    // 남은 데이터가 없다면 bufferList에서 제거
-                    bufferList.RemoveAt(i);
+                    // 패킷 처리
+                    OnRecvPacket(new ArraySegment<byte>(
+                        segment.Array!,
+                        segment.Offset + (_readOffset - segment.Offset),
+                        dataSize
+                    ));
+
+                    processLen += dataSize;
+
+                    // ReadPos 이동
+                    _readOffset += dataSize;
+
+                    // 모든 데이터를 읽었다면 ReadPos, WritePos 초기화
+                    if (_readOffset == _writeOffset)
+                    {
+                        _readOffset = 0;
+                        _writeOffset = 0;
+                    }
+                    // 일부 데이터만 남아 있다면 앞으로 당김
+                    else if (_readOffset > 0 && _readOffset < _writeOffset)
+                    {
+                        bufferList[i] = new ArraySegment<byte>(
+                            segment.Array!,
+                            segment.Offset + (_readOffset - segment.Offset),
+                            segment.Count - (_readOffset - segment.Offset)
+                        );
+                    }
                 }
             }
 
@@ -121,6 +122,11 @@ namespace ServerCore
 
         SocketAsyncEventArgs _sendArgs = new SocketAsyncEventArgs();
         SocketAsyncEventArgs _recvArgs = new SocketAsyncEventArgs();
+
+        //Buffer 읽기용도...''
+        protected int _readOffset = 0;
+        protected int _writeOffset = 0;
+
 
         //연결 성공
         public abstract void OnConnected(EndPoint endPoint);
@@ -225,7 +231,6 @@ namespace ServerCore
                 Console.WriteLine($"_socketConnected ERROR");
             }
 
-
             if (_socket.ReceiveAsync(_recvArgs) == false)
             {
                 OnRecvCompleted(null, _recvArgs);
@@ -247,6 +252,9 @@ namespace ServerCore
                         DisConnect();
                         return;
                     }
+
+                    _writeOffset += _recvArgs.BytesTransferred;
+
 
                     // 실제로 받은 패킷 처리가 되는 곳
                     OnRecv(_recvArgs.BufferList!);

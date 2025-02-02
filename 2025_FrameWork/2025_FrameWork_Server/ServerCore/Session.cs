@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
 using System.Net.Sockets;
 
 namespace ServerCore
@@ -47,24 +48,22 @@ namespace ServerCore
 
         public sealed override int OnRecv(IList<ArraySegment<byte>> bufferList)
         {
-            //처리한 데이터 사이즈
             int processLen = 0;
-            
-            for(int i = bufferList.Count-1, len = bufferList.Count; i >= 0; --i)
+
+            for (int i = bufferList.Count - 1; i >= 0; --i)
             {
-                // 각 ArraySegment<byte> 처리
                 ArraySegment<byte> buffer = bufferList[i];
 
                 // 최소한 헤더는 파싱할 수 있는지 확인
                 while (buffer.Count >= SystemDef.HEADER_SIZE)
                 {
-                    // 패킷 크기 확인: 헤더에 저장된 데이터 크기
+                    // 헤더에서 패킷 크기 확인
                     ushort dataSize = BitConverter.ToUInt16(buffer.Array!, buffer.Offset);
 
                     // 패킷이 완전한지 확인
                     if (buffer.Count < dataSize)
                     {
-                        break;
+                        break; // 패킷이 불완전하면 더 이상 읽지 않고 멈춤
                     }
 
                     // 패킷이 완전하면 처리
@@ -73,26 +72,32 @@ namespace ServerCore
                     // 처리된 데이터 크기만큼 버퍼에서 제거
                     processLen += dataSize;
 
-                    // 버퍼를 업데이트하여 나머지 데이터를 다시 설정
-                    buffer = new ArraySegment<byte>(buffer.Array!, buffer.Offset + dataSize, buffer.Count - dataSize);
+                    // 나머지 데이터 처리 - 처리된 만큼 버퍼를 갱신
+                    int remainingDataSize = buffer.Count - dataSize;
+                    buffer = new ArraySegment<byte>(buffer.Array!, buffer.Offset + dataSize, remainingDataSize);
+
+                    // 더 이상 처리할 데이터가 없으면 중단
+                    if (buffer.Count < SystemDef.HEADER_SIZE)
+                    {
+                        break;
+                    }
                 }
 
+                // 남은 데이터가 있을 경우 bufferList에 갱신
                 if (buffer.Count > 0)
                 {
                     bufferList[i] = buffer;
                 }
-                // 남은 데이터가 없으면 버퍼를 제거 인데 한개는 무조건 가지고 있어야함
                 else
                 {
-                    if (i > 1)
-                    {
-                        bufferList.RemoveAt(i);
-                    }
+                    // 남은 데이터가 없다면 bufferList에서 제거
+                    bufferList.RemoveAt(i);
                 }
             }
 
             return processLen;
         }
+
 
         public abstract void OnRecvPacket(ArraySegment<byte> buffer);
     }
@@ -105,14 +110,17 @@ namespace ServerCore
     public abstract class Session
     {
         Socket? _socket;
+        public Socket? Socket { get { return _socket; } }
+
+
         int _disconnected = 0;
         
         Queue<ArraySegment<byte>> _sendQueue = new Queue<ArraySegment<byte>>();
-
+        List<ArraySegment<byte>> _sendlingList = new List<ArraySegment<byte>>();
         object _lock = new object();
+
         SocketAsyncEventArgs _sendArgs = new SocketAsyncEventArgs();
         SocketAsyncEventArgs _recvArgs = new SocketAsyncEventArgs();
-        private bool _pending = false;
 
         //연결 성공
         public abstract void OnConnected(EndPoint endPoint);
@@ -128,7 +136,6 @@ namespace ServerCore
         {
             _socket = socket;
 
-            BufferManager.Instance.SetBuffer(_sendArgs);
             BufferManager.Instance.SetBuffer(_recvArgs);
 
             _recvArgs.Completed += new EventHandler<SocketAsyncEventArgs>(OnRecvCompleted);
@@ -143,7 +150,7 @@ namespace ServerCore
             lock (_lock)
             {
                 _sendQueue.Enqueue(sendBuffer);
-                if (_pending == false) 
+                if (_sendlingList.Count == 0) 
                 {
                     RegsiterSend();
                 }
@@ -153,15 +160,15 @@ namespace ServerCore
 
         void RegsiterSend()
         {
-            _pending = true;
             while (_sendQueue.Count > 0)
             {
                 ArraySegment<byte> buff = _sendQueue.Dequeue();
-                _sendArgs.BufferList!.Add(buff);
+                _sendlingList.Add(buff);
             }
 
-            bool pending = _socket!.SendAsync(_sendArgs);
-            if (pending == false)
+            _sendArgs.BufferList = _sendlingList;
+
+            if (_socket!.SendAsync(_sendArgs) == false)
             {
                 OnSendCompleted(null, _sendArgs);
             }
@@ -172,12 +179,12 @@ namespace ServerCore
         {
             lock (_lock)
             {
-                _pending = false;
                 if (args.BytesTransferred > 0 && args.SocketError == SocketError.Success)
                 {
                     try
                     {
-                        _sendArgs.BufferList!.Clear();
+                        _sendArgs.BufferList = null;
+                        _sendlingList.Clear();
 
                         OnSend(_sendArgs.BytesTransferred);
 
@@ -213,9 +220,13 @@ namespace ServerCore
                 return;
             }
 
-            bool pending = _socket.ReceiveAsync(_recvArgs);
+            if (_socket.Connected == false)
+            {
+                Console.WriteLine($"_socketConnected ERROR");
+            }
 
-            if (pending==false)
+
+            if (_socket.ReceiveAsync(_recvArgs) == false)
             {
                 OnRecvCompleted(null, _recvArgs);
             }
@@ -249,6 +260,9 @@ namespace ServerCore
             }
             else
             {
+                Console.WriteLine($"Socket Err -> {args.RemoteEndPoint}");
+                Console.WriteLine($"Socket Err -> {args.SocketError}");
+                Console.WriteLine($"OnRecvCompleted -> {args.BytesTransferred}bytes");
                 DisConnect();
             }
         }

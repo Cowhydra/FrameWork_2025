@@ -17,6 +17,12 @@ public class InputManager : SingletonObj<InputManager>
         _InputActions = new InputSystem_Actions();
     }
 
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        _InputActions = null;
+    }
+
 
     public void OnPlayerMoveInput(Action<Vector2> moveInput)
     {

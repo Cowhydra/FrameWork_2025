@@ -44,6 +44,7 @@ namespace ServerCore
 
         /// <summary>
         /// 버퍼를 할당하여 SocketAsyncEventArgs에 추가
+        /// //BufferList 에 add를 하면 되지 않음 
         /// </summary>
         public bool SetBuffer(SocketAsyncEventArgs args)
         {
@@ -53,14 +54,15 @@ namespace ServerCore
                 {
                     byte[] buffer = _freeBuffers.Pop();
                     args.BufferList ??= new List<ArraySegment<byte>>(); // BufferList가 없으면 초기화
-                    args.BufferList.Add(new ArraySegment<byte>(buffer, 0, _bufferSize));
+                    var list = args.BufferList;
+                    list.Add(new ArraySegment<byte>(buffer, 0, _bufferSize));
+                    args.BufferList = list;
                     return true;
                 }
             }
 
             return false; // 사용 가능한 버퍼가 없음
         }
-
 
 
         /// <summary>
@@ -87,11 +89,13 @@ namespace ServerCore
 
                 foreach (var segment in args.BufferList)
                 {
-                    // 각 ArraySegment의 남은 공간을 확인
-                    int remainingSpace = segment.Array!.Length - segment.Offset - segment.Count;
+                    // 남은 공간 계산: 전체 버퍼 크기 - 현재 Offset
+                    int remainingSpace = segment.Array!.Length - segment.Offset;
+
+                    // 남은 공간이 전송된 바이트 수보다 충분한지 확인
                     if (remainingSpace >= args.BytesTransferred)
                     {
-                        return true; // 남은 공간이 충분함
+                        return true; // 남은 공간이 충분하다면 true 반환
                     }
                 }
             }

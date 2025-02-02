@@ -29,10 +29,10 @@ public class Program
 
         Listener _listener = new Listener(endPoint,
             () => 
-        { 
-                ClientSession client = new ClientSession();
-                Clients.Add(client);
-                return client;
+        {
+                var clientSession = SessionPool<ClientSession>.Instance.GetSession();
+                Clients.Add(clientSession);
+                return clientSession;
         });
 
         while (true)

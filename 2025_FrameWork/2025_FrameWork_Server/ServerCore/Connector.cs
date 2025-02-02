@@ -11,6 +11,7 @@ namespace ServerCore
         public void Connect(IPEndPoint endPoint, Func<Session> sessionFactory)
         {
             Socket socket = new Socket(endPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            
             _sessionFactory = sessionFactory;
 
             SocketAsyncEventArgs args = new SocketAsyncEventArgs();
@@ -49,6 +50,7 @@ namespace ServerCore
                 Session session = _sessionFactory.Invoke();
                 session.Start(args.ConnectSocket);
                 session.OnConnected(args.RemoteEndPoint!);
+
             }
             else
             {

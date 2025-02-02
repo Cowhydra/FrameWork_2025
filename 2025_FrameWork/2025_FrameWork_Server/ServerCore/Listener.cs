@@ -49,10 +49,11 @@ namespace ServerCore
             try
             {
                 if (args.SocketError == SocketError.Success)
-                {  // AcceptSocket이 null이 아님을 확신
+                {  
                     Socket acceptedSocket = args.AcceptSocket!;
 
                     // 소켓이 Dispose되기 전에 원격 엔드포인트 정보를 가져옴
+                    // 왜그런지 모르겠는데 Dispose됨..
                     EndPoint remoteEndPoint = acceptedSocket.RemoteEndPoint!;
 
                     Session session = _sessionFactory.Invoke();
@@ -70,8 +71,6 @@ namespace ServerCore
             }
             finally
             {
-                // AcceptSocket을 초기화하여 재사용 시 문제 없게 함
-                args.AcceptSocket = null;
                 RegisterAccept(args);
             }
         }

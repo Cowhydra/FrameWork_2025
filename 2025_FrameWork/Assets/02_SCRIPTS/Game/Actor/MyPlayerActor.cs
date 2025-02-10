@@ -19,6 +19,7 @@ public class MyPlayerActor : PlayerActor
     }
 
 
+    //TODO: 패킷 보내야함
     public void Moving(Vector2 movePos)
     {
         Vector3 movement = new Vector3(movePos.x, 0, movePos.y) * _moveSpeed * Time.deltaTime;

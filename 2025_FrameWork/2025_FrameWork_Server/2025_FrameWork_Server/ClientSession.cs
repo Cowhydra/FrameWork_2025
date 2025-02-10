@@ -11,9 +11,21 @@ namespace _2025_FrameWork_Server
 
         public enum N_E_PACKET_ID :ushort
         {
-           CONNECT=1,
+           CONNECT=10000,
+
+           //오브젝트 처리
+           OBJECT_MOVE=1,
+           OBJECT_HP=2,
+           OBJECT_MP=3,
+           OBJECT_ACTION=4,
+           OBJECT_INFO=5,
+
+
+        
+
 
         }
+
 
         public enum N_E_LOGIN_TYPE : ushort
         {

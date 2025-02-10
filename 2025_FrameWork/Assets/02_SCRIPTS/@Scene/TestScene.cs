@@ -6,11 +6,8 @@ public class TestScene : GameScene
 
     private void Start()
     {
-        NetWorkObject.ExplicitInit();
 
-        NetWorkObject.Instance.ConnectToServer();
 
-        StartCoroutine(nameof(LoginCO));
     }
 
     private IEnumerator LoginCO()

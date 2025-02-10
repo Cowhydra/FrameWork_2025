@@ -31,7 +31,7 @@ public class MonsterDataEditor : Editor
                 // 랜덤 드롭 아이템 생성
                 string dropItemsField = $"{Random.Range(1, 100)};{Random.Range(1, 100)};{Random.Range(1, 100)}";
 
-                writer.WriteLine($"{uniqueKey},{health},{mana},{attackPower},{attackRange:F1},{moveSpeed:F1},{detectionRange:F1},{chaseRange:F1},{modelNumber},{dropItemsField}.{attackType},{bulletID}");
+                writer.WriteLine($"{uniqueKey},{health},{mana},{attackPower},{attackRange:F1},{moveSpeed:F1},{detectionRange:F1},{chaseRange:F1},{modelNumber},{dropItemsField},{attackType},{bulletID}");
             }
         }
 

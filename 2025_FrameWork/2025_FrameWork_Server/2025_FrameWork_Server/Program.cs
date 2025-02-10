@@ -2,39 +2,21 @@
 using _2025_FrameWork_Server;
 using ServerCore;
 
+
 public class Program
 {
-    public static List<ClientSession> Clients = new List<ClientSession>();
-
-    //여기는 1번 서버..
-    //다른 존 서버들을 만든다면 포트만 다르게 
-
     static void Main(string[] args)
     {
-        // DNS (Domain Name System)
+        //데이터 정리
+        DataManager.LoadMonsterData();
 
-        // -- 서버 로컬 주소 --
-        string host = Dns.GetHostName();
-        IPHostEntry ipHost = Dns.GetHostEntry(host);
-        IPAddress? ipAddr = null;
-        foreach (IPAddress addr in ipHost.AddressList)
-        {
-            if (addr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
-            {
-                ipAddr = addr;
-                break;
-            }
-        }
-        IPEndPoint endPoint = new IPEndPoint(ipAddr!, 54321);
+        //서버 스타트(리슨)
+        // 간단 ->  1개의 존서버
+        ZoneManager zoneManager = new ZoneManager();
 
-        Listener _listener = new Listener(endPoint,
-            () => 
-        {
-                var clientSession = SessionPool<ClientSession>.Instance.GetSession();
-                Clients.Add(clientSession);
-                return clientSession;
-        });
+        zoneManager.Init();
 
+    
         while (true)
         {
         }

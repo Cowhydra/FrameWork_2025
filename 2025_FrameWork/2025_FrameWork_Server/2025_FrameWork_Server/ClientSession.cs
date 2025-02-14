@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using _2025_FrameWork_Server.Object;
 using ServerCore;
 
 namespace _2025_FrameWork_Server
@@ -8,6 +9,10 @@ namespace _2025_FrameWork_Server
     {
         //ushort -> 2바이트
         //int - > 4바이트 
+
+        public Zone? Owner;
+        public S_OBJECT_PLAYER? S_OBJECT_PLAYER;
+
 
         public enum N_E_PACKET_ID :ushort
         {
@@ -33,6 +38,12 @@ namespace _2025_FrameWork_Server
             GOOGLE=2,
             APPLE=3,
         }
+
+        public void Initainlize(Zone? owner)
+        {
+            //TODO: DB 서치 후 S_BOEJCT PLAYER 넣어주기
+        }
+
 
 
         public override void OnConnected(EndPoint endPoint)

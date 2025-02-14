@@ -2,15 +2,14 @@ using UnityEngine;
 
 public partial class MonsterActor : BaseActor
 {
-    public PlayerActor TargetActor => GameLogic.MyPlayer;
     private StateMachine _MonsterAI;
     public bool IsMoving = false;
 
-    public float moveSpeed => _MonsterData.MoveSpeed;
-    public float chaseRange => _MonsterData.ChaseRange;
-    public float attackpower => _MonsterData.AttackPower;
-    public float attackRange => _MonsterData.AttackRange;
-    public float detectRange => _MonsterData.DetectionRange;
+    private float moveSpeed => _MonsterData.MoveSpeed;
+    private float chaseRange => _MonsterData.ChaseRange;
+    private float attackpower => _MonsterData.AttackPower;
+    private float attackRange => _MonsterData.AttackRange;
+    private float detectRange => _MonsterData.DetectionRange;
 
     public D_F_Enum.E_ATTACK_TYPE attackType => _MonsterData.AttackType;
 

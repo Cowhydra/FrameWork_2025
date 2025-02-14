@@ -72,4 +72,40 @@ public static partial class AssetServer
 
         return stageList.ToDictionary(x => x.StageIndex, x => x);
     });
+
+
+
+    public static Lazy<Dictionary<int, SkillData>> SkillDataDict = new(() =>
+    {
+        TotalResourceDict.TryGetValue("data/SkillData", out UnityEngine.Object Value);
+        if (Value == null)
+        {
+            Debug.LogError("SkillData.csv not found in TotalResourceDict");
+            return new Dictionary<int, SkillData>();
+        }
+
+        TextAsset asset = Value as TextAsset;
+        if (asset == null)
+        {
+            Debug.LogError("Value is Not TextAsset");
+            return new Dictionary<int, SkillData>();
+        }
+
+        List<SkillData> stageList = new();
+        string[] lines = asset.text.Split('\n');
+        for (int i = 1; i < lines.Length; i++) // 첫 줄은 헤더
+        {
+            if (string.IsNullOrWhiteSpace(lines[i]))
+            {
+                continue;
+            }
+
+            string[] fields = lines[i].Split(',');
+            int uniqueKey = int.Parse(fields[0]);
+            SkillData monster = new SkillData(uniqueKey, fields);
+            stageList.Add(monster);
+        }
+
+        return stageList.ToDictionary(x => x.SkillIndex, x => x);
+    });
 }

@@ -70,6 +70,16 @@ namespace D_F_Enum
     }
 
 
+    // PASSIVE(1) or SINGLE(2) or MULTI(3) or AREA(4)
+    public enum E_SKILL_TYPE
+    {
+        NONE=0,
+        PASSIVE=1,
+        SINGLE=2,
+        MULTI=3,
+        AREA=4
+    }
+
 
 
     public static class SCENE_NAME

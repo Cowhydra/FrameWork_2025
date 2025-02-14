@@ -12,7 +12,7 @@ public class Program
 
         //서버 스타트(리슨)
         // 간단 ->  1개의 존서버
-        ZoneManager zoneManager = new ZoneManager();
+        Zone zoneManager = new Zone();
 
         zoneManager.Init();
 

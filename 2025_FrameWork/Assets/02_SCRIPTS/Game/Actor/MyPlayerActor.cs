@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class MyPlayerActor : PlayerActor
+public partial class MyPlayerActor : PlayerActor
 {
     private void OnEnable()
     {

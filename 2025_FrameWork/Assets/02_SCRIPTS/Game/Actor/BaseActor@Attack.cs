@@ -14,7 +14,7 @@ public partial class BaseActor : MonoBehaviour
         }
 
         //E_HIT_SORT를 어디거 자여올지 확인 ---> 그냥 함수 3갤 ㅗ할지
-        GameLogic.Instance.HIT(ObjectType, UniqueIndex, ThisAttackID, TargetActor.ObjectType, TargetActor.UniqueIndex, E_HIT_SORT.NORMAL, Damage);
+        GameLogic.Instance.HIT(ObjectType, ServerIndex, ThisAttackID, TargetActor.ObjectType, TargetActor.ServerIndex, E_HIT_SORT.NORMAL, Damage);
     }
 
 
@@ -36,7 +36,7 @@ public partial class BaseActor : MonoBehaviour
             if (Vector3.SqrMagnitude(monsters[i].GetCord - GetCord) < distance)
             {
                 curNum++;
-                GameLogic.Instance.HIT(ObjectType, UniqueIndex, ThisAttackID, monsters[i].ObjectType, monsters[i].UniqueIndex, E_HIT_SORT.NORMAL, Damage);
+                GameLogic.Instance.HIT(ObjectType, ServerIndex, ThisAttackID, monsters[i].ObjectType, monsters[i].ServerIndex, E_HIT_SORT.NORMAL, Damage);
             }
         }
     }
@@ -59,7 +59,7 @@ public partial class BaseActor : MonoBehaviour
             if (Vector3.SqrMagnitude(monsters[i].GetCord - pos) < distance)
             {
                 curNum++;
-                GameLogic.Instance.HIT(ObjectType, UniqueIndex, ThisAttackID, monsters[i].ObjectType, monsters[i].UniqueIndex, E_HIT_SORT.NORMAL, Damage);
+                GameLogic.Instance.HIT(ObjectType, ServerIndex, ThisAttackID, monsters[i].ObjectType, monsters[i].ServerIndex, E_HIT_SORT.NORMAL, Damage);
             }
         }
     }

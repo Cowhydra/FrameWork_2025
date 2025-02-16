@@ -11,11 +11,10 @@ public partial class MonsterActor : BaseActor
     public bool IsDead => Health[0] > 0;
 
 
-    public void Set(int monsterIndex, int uniqueIndex,int clientIndex, StageData stageData)
+    public void Set(int monsterIndex,int clientIndex)
     {
+        UniqueIndex = monsterIndex;
         ClientIndex = clientIndex;
-        UniqueIndex = uniqueIndex;
-        _StageData = stageData;
 
         if (AssetServer.MonsterDataDict.Value.TryGetValue(monsterIndex, out _MonsterData) == false)
         {

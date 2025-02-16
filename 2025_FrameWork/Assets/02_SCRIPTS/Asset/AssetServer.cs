@@ -74,7 +74,7 @@ public static partial class AssetServer
     }
 
 
-    public static async Task<GameObject> InstantiateAsync(string key, Transform parent = null, bool pooling = false)
+    public static async Task<T> InstantiateAsync<T>(string key, Transform parent = null, bool pooling = false) where T : UnityEngine.Object
     {
         // LoadAsync로 비동기적으로 리소스를 로드
         GameObject prefab = await LoadAsync<GameObject>(key);
@@ -88,14 +88,15 @@ public static partial class AssetServer
         // 풀링 사용 여부 체크
         if (pooling)
         {
-            return ObjectPool.Instance.Pop(prefab);
+            return ObjectPool.Instance.Pop(prefab).GetComponent<T>();
         }
 
         // 풀링을 사용하지 않는 경우 인스턴스를 생성
         GameObject go = UnityEngine.Object.Instantiate(prefab, parent);
         go.name = prefab.name;
-        return go;
+        return go.GetComponent<T>();
     }
+
 
     #region 생성 
     public static GameObject Instantiate(GameObject resource, Transform parent = null, bool pooling = false)
@@ -138,34 +139,6 @@ public static partial class AssetServer
 
         return go as T;
     }
-
-
-    public static bool InstantiateAtLoaded(string label, Transform parent = null, bool pooling = false)
-    {
-        if (TotalResourceDict.ContainsKey(label) == false)
-        {
-            return false;
-        }
-
-        GameObject resource = TotalResourceDict[label] as GameObject;
-
-        if (resource == null)
-        {
-            Debug.LogError($"Prefab is Null");
-            return false;
-        }
-
-        if (pooling)
-        {
-            return ObjectPool.Instance.Pop(resource);
-        }
-
-        GameObject go = UnityEngine.Object.Instantiate(resource, parent);
-
-        go.name = resource.name;
-
-        return go;
-    }
     #endregion
 
 
@@ -187,7 +160,17 @@ public static partial class AssetServer
 
     public static T InstantiateFromResource<T>(string path, Transform parent = null, bool pooling = false)
     {
-        GameObject prefab = LoadFromResources<GameObject>(path);
+        GameObject prefab;
+     
+        if (TotalResourceDict.ContainsKey(path) == false)
+        {
+            prefab = LoadFromResources<GameObject>(path);
+        }
+        else
+        {
+            prefab = TotalResourceDict[path] as GameObject;
+        }
+
         if (prefab == null)
         {
             Debug.LogError($"Failed to load prefab : {path}");

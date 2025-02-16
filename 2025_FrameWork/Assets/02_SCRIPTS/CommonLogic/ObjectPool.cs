@@ -2,14 +2,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-public  class ObjectPool :Singleton<ObjectPool>
+public class ObjectPool : Singleton<ObjectPool>
 {
     Dictionary<string, Pool> _pools = new Dictionary<string, Pool>();
 
-    public  GameObject Pop(GameObject prefab)
+    public GameObject Pop(GameObject prefab)
     {
         if (_pools.ContainsKey(prefab.name) == false)
+        {
             CreatePool(prefab);
+        }
 
         return _pools[prefab.name].Pop();
     }
@@ -17,7 +19,9 @@ public  class ObjectPool :Singleton<ObjectPool>
     public bool Push(GameObject go)
     {
         if (_pools.ContainsKey(go.name) == false)
+        {
             return false;
+        }
 
         _pools[go.name].Push(go);
         return true;
@@ -101,4 +105,3 @@ class Pool
     }
     #endregion
 }
-

@@ -36,18 +36,4 @@ public partial class GameLogic : MonoBehaviour
         Initialzied_Actor();
 
     }
-
-
-
-
-    public IEnumerator StageLoad()
-    {
-        _Spawner.SpawnStop();
-        yield return null;
-        ClearMonster();
-        yield return null;
-        SetUpNextStage();
-        yield return null;
-        _Spawner.SpawnStart();
-    }
 }

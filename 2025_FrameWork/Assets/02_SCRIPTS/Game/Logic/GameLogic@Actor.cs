@@ -6,11 +6,12 @@ public partial class GameLogic : MonoBehaviour
     public static PlayerActor MyPlayer;
 
     //몬스터 관리용도
-    private MonsterActor[] _Monsters = new MonsterActor[100];
+    private MonsterActor[] _Monsters = new MonsterActor[GameDefine.MAX_MONSTER];
     public MonsterActor[] Monsters => _Monsters;
 
     //몬스터 관리용도
-    private PlayerActor[] _Players= new PlayerActor[10];
+    private PlayerActor[] _Players= new PlayerActor[GameDefine.MAX_PLAYER];
+
     public PlayerActor[] Players => _Players;
 
     public void Initialzied_Actor()
@@ -24,7 +25,7 @@ public partial class GameLogic : MonoBehaviour
     }
 
 
-    public bool FindPlayer(int uniqueIndex, out PlayerActor actor)
+    public bool FindPlayer(int serverIndex, out PlayerActor actor)
     {
         actor = null;
 
@@ -35,7 +36,7 @@ public partial class GameLogic : MonoBehaviour
                 continue;
             }
 
-            if (_Players[i].UniqueIndex == uniqueIndex)
+            if (_Players[i].ServerIndex == serverIndex)
             {
                 actor= _Players[i];
                 return true;
@@ -46,7 +47,7 @@ public partial class GameLogic : MonoBehaviour
     }
 
 
-    public bool FindMonster(int uniqueIndex, out MonsterActor actor)
+    public bool FindMonster(int serverIndex, out MonsterActor actor)
     {
         actor = null;
 
@@ -57,7 +58,7 @@ public partial class GameLogic : MonoBehaviour
                 continue;
             }
 
-            if (_Monsters[i].UniqueIndex == uniqueIndex)
+            if (_Monsters[i].ServerIndex == serverIndex)
             {
                 actor = _Monsters[i];
                 return true;

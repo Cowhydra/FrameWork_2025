@@ -22,6 +22,7 @@ public partial class BaseActor : MonoBehaviour
     public Vector3 GetCord => gameObject.transform.position;
     public int ClientIndex { get; protected set; } = -1;
     public int UniqueIndex { get; protected set; }
+    public int ServerIndex { get; protected set; }
 
     public int ThisActionID { get; protected set; }
 
